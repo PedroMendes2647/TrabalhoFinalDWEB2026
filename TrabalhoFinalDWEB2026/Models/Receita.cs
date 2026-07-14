@@ -34,30 +34,30 @@ namespace TrabalhoFinalDWEB2026.Models {
          ***************************************************** */
 
         /// <summary>
-        /// FK para o Utente que vai receber a medicação
+        /// FK para o Utente/Paciente que vai receber a medicação (Classe Base)
         /// </summary>
         [Required]
-        [ForeignKey("Utente")]
+        [ForeignKey("MyUser")]
         [DisplayName("Paciente/Utente")]
-        public int UtenteId { get; set; }
-        public virtual Utente? Utente { get; set; }
+        public int MyUserId { get; set; }
+        public virtual MyUser? MyUser { get; set; }
 
         /// <summary>
-        /// FK para o Médico que prescreveu e criou a receita
+        /// FK para o Médico que prescreveu a receita
         /// </summary>
         [Required]
         [ForeignKey("Doutor")]
-        [DisplayName("Doutor Prescritor")]
-        public int DoutorId { get; set; }
-        public virtual Doutor? Doutor { get; set; }
+        [DisplayName("Médico Prescritor")]
+        public int DoctorId { get; set; }
+        public virtual Doutor? Doctor { get; set; } 
 
         /// <summary>
-        /// FK para o Farmacêutico que efetuou o aviamento (Pode ser null pois a receita é criada sem ser aviada)
+        /// FK para o Farmacêutico que efetuou o aviamento
         /// </summary>
         [ForeignKey("Farmaceuta")]
-        [DisplayName("Farmacêuta Responsável")]
+        [DisplayName("Farmacêutico Responsável")]
         public int? FarmaceutaId { get; set; }
-        public virtual Farmaceuta? Farmaceuta { get; set; }
+        public virtual Farmaceuta? Farmaceuta { get; set; } 
 
         /* *****************************************************
          ************* relações entre entidades M-N ************
