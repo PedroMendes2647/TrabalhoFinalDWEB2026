@@ -10,7 +10,7 @@ namespace TrabalhoFinalDWEB2026.Data
         {
         }
 
-        public DbSet<MyUser> MyUsers { get; set; }
+        public DbSet<Utente> Utentes { get; set; }
         public DbSet<Doutor> Doutores { get; set; }
         public DbSet<Farmaceuta> Farmaceutas { get; set; }
         public DbSet<Medicamento> Medicamentos { get; set; }
@@ -22,16 +22,16 @@ namespace TrabalhoFinalDWEB2026.Data
             base.OnModelCreating(modelBuilder);
 
             // Table per Hierarchy (TPH) is default, but ensuring uniqueness if required for the future
-            modelBuilder.Entity<MyUser>()
+            modelBuilder.Entity<Utente>()
                 .HasDiscriminator<string>("UserType")
-                .HasValue<MyUser>("MyUser")
+                .HasValue<Utente>("Utente")
                 .HasValue<Doutor>("Doutor")
                 .HasValue<Farmaceuta>("Farmaceuta");
 
             modelBuilder.Entity<Receita>()
-                .HasOne(r => r.MyUser)
+                .HasOne(r => r.Utente)
                 .WithMany(u => u.Receitas)
-                .HasForeignKey(r => r.MyUserId)
+                .HasForeignKey(r => r.UtenteId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Receita>()

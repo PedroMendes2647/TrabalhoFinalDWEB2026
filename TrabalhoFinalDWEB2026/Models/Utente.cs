@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace TrabalhoFinalDWEB2026.Models
 {
-    public class MyUser
+    public class Utente
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
