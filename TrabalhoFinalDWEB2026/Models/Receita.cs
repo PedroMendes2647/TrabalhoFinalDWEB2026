@@ -34,16 +34,16 @@ namespace TrabalhoFinalDWEB2026.Models {
          ***************************************************** */
 
         /// <summary>
-        /// FK para o Utente que vai receber a medicação
+        /// FK para o Utente/Paciente que vai receber a medicação (Classe Base)
         /// </summary>
         [Required]
-        [ForeignKey("Utente")]
+        [ForeignKey("MyUser")]
         [DisplayName("Paciente/Utente")]
         public string UtenteId { get; set; } = string.Empty;
         public virtual Utente? Utente { get; set; }
 
         /// <summary>
-        /// FK para o Médico que prescreveu e criou a receita
+        /// FK para o Médico que prescreveu a receita
         /// </summary>
         [Required]
         [ForeignKey("Doutor")]
@@ -52,7 +52,7 @@ namespace TrabalhoFinalDWEB2026.Models {
         public virtual Doutor? Doutor { get; set; }
 
         /// <summary>
-        /// FK para o Farmacêutico que efetuou o aviamento (Pode ser null pois a receita é criada sem ser aviada)
+        /// FK para o Farmacêutico que efetuou o aviamento
         /// </summary>
         [ForeignKey("Farmaceuta")]
         [DisplayName("Farmacêuta Responsável")]
