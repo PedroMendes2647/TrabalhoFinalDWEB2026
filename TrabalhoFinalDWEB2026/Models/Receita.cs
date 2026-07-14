@@ -39,7 +39,7 @@ namespace TrabalhoFinalDWEB2026.Models {
         [Required]
         [ForeignKey("Utente")]
         [DisplayName("Paciente/Utente")]
-        public int UtenteId { get; set; }
+        public string UtenteId { get; set; } = string.Empty;
         public virtual Utente? Utente { get; set; }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace TrabalhoFinalDWEB2026.Models {
         [Required]
         [ForeignKey("Doutor")]
         [DisplayName("Doutor Prescritor")]
-        public int DoutorId { get; set; }
+        public string DoutorId { get; set; } = string.Empty;
         public virtual Doutor? Doutor { get; set; }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace TrabalhoFinalDWEB2026.Models {
         /// </summary>
         [ForeignKey("Farmaceuta")]
         [DisplayName("Farmacêuta Responsável")]
-        public int? FarmaceutaId { get; set; }
+        public string? FarmaceutaId { get; set; }
         public virtual Farmaceuta? Farmaceuta { get; set; }
 
         /* *****************************************************
