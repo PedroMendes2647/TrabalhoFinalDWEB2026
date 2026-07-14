@@ -1,0 +1,50 @@
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace TrabalhoFinalDWEB2026.Models {
+    /// <summary>
+    /// Representa um medicamento disponível no sistema (ex: "Paracetamol", "Ibuprofeno", etc.)
+    /// </summary>
+    public class Medicamentos {
+
+        /// <summary>
+        /// PK
+        /// </summary>
+        [Key]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// Nome do medicamento
+        /// </summary>
+        [Required(ErrorMessage = "O nome do medicamento é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O nome não pode exceder os 100 caracteres.")]
+        [DisplayName("Nome do Medicamento")]
+        public string Nome { get; set; } = "";
+
+        /// <summary>
+        /// Dosagem do medicamento (ex: "500mg", "1g", etc.)
+        /// </summary>
+        [Required(ErrorMessage = "A dosagem do medicamento é obrigatória.")]
+        [StringLength(30, ErrorMessage = "A dosagem não pode exceder os 30 caracteres.")]
+        [DisplayName("Dosagem")]
+        public string Dosagem { get; set; } = "";
+
+        /// <summary>
+        /// Forma farmacêutica do medicamento (ex: "Comprimido", "Xarope", "Pomada")
+        /// </summary>
+        [StringLength(50)]
+        [DisplayName("Forma Farmacêutica")]
+        public string Forma { get; set; } = "";
+
+        /* *****************************************************
+         ************* relações entre entidades M-N ************
+         ***************************************************** */
+
+        /// <summary>
+        /// Lista de receitas onde este medicamento foi incluído
+        /// </summary>
+        public ICollection<ReceitaMedicamentos> ListaDeReceitas { get; set; } = [];
+
+        /* **************************************************** */
+    }
+}

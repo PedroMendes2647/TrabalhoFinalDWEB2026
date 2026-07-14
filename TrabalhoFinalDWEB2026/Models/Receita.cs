@@ -1,19 +1,74 @@
-using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TrabalhoFinalDWEB2026.Models
-{
-    public class Receita
-    {
+namespace TrabalhoFinalDWEB2026.Models {
+    /// <summary>
+    /// Representa uma receita médica emitida para um utente, associada a um médico e opcionalmente aviada por um farmacêutico
+    /// </summary>
+    public class Receita {
+        /// <summary>
+        /// PK
+        /// </summary>
+        [Key]
         public int Id { get; set; }
 
-        public int MyUserId { get; set; }
-        public MyUser? MyUser { get; set; }
+        /// <summary>
+        /// Data e hora em que a receita foi criada pelo médico
+        /// </summary>
+        [Required]
+        [DisplayName("Data de Emissão")]
+        [DataType(DataType.DateTime)]
+        public DateTime DataEmissao { get; set; } = DateTime.Now;
 
-        public int DoctorId { get; set; }
-        public Doutor? Doctor { get; set; }
+        /// <summary>
+        /// Estado atual da receita (ex: "Emitida", "Aviada", "Expirada")
+        /// </summary>
+        [Required]
+        [StringLength(20)]
+        [DisplayName("Estado da Receita")]
+        public string Estado { get; set; } = "Emitida";
 
-        public ICollection<ReceitaMedicamento> ReceitaMedicamentos { get; set; } = new List<ReceitaMedicamento>();
+        /* *****************************************************
+         ************* relações entre entidades N-1 ************
+         ***************************************************** */
 
-        public DateTime Date { get; set; }
+        /// <summary>
+        /// FK para o Utente que vai receber a medicação
+        /// </summary>
+        [Required]
+        [ForeignKey("Utente")]
+        [DisplayName("Paciente/Utente")]
+        public int UtenteId { get; set; }
+        public virtual Utente? Utente { get; set; }
+
+        /// <summary>
+        /// FK para o Médico que prescreveu e criou a receita
+        /// </summary>
+        [Required]
+        [ForeignKey("Doutor")]
+        [DisplayName("Doutor Prescritor")]
+        public int DoutorId { get; set; }
+        public virtual Doutor? Doutor { get; set; }
+
+        /// <summary>
+        /// FK para o Farmacêutico que efetuou o aviamento (Pode ser null pois a receita é criada sem ser aviada)
+        /// </summary>
+        [ForeignKey("Farmaceuta")]
+        [DisplayName("Farmacêuta Responsável")]
+        public int? FarmaceutaId { get; set; }
+        public virtual Farmaceuta? Farmaceuta { get; set; }
+
+        /* *****************************************************
+         ************* relações entre entidades M-N ************
+         ***************************************************** */
+
+        /// <summary>
+        /// Lista de medicamentos incluídos nesta receita médica
+        /// </summary>
+        [DisplayName("Medicamentos Receitados")]
+        public ICollection<ReceitaMedicamentos> ListaDeMedicamentos { get; set; } = [];
+
+        /* **************************************************** */
     }
 }
