@@ -2,7 +2,9 @@ namespace TrabalhoFinalDWEB2026.Models
 {
     public class Farmaceuta : Utente
     {
-        // Add pharmacist specific properties here if necessary later on.
+        /// <summary>
+        /// Receitas médicas aviadas pelo farmacêutico para os utentes/pacientes
+        /// </summary>
         public ICollection<Receita> ReceitasAviadas { get; set; } = new List<Receita>();
     }
 }
