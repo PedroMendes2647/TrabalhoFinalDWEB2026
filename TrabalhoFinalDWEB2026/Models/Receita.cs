@@ -29,6 +29,13 @@ namespace TrabalhoFinalDWEB2026.Models {
         [DisplayName("Estado da Receita")]
         public string Estado { get; set; } = "Emitida";
 
+        /// <summary>
+        /// Data e hora em que a receita foi aviada pelo farmacêutico
+        /// </summary>
+        [DisplayName("Data de Dispensação")]
+        [DataType(DataType.DateTime)]
+        public DateTime? DataDispensacao { get; set; }
+
         /* *****************************************************
          ************* relações entre entidades N-1 ************
          ***************************************************** */
