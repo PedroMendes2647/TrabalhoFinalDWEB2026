@@ -46,6 +46,7 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+app.MapControllers(); // Enable API controllers
 app.MapStaticAssets();
 
 app.MapControllerRoute(
