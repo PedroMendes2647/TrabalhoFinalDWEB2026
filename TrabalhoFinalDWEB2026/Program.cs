@@ -1,7 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddDbContext<TrabalhoFinalDWEB2026.Data.ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=(localdb)\\mssqllocaldb;Database=TrabalhoFinalDWEB2026;Trusted_Connection=True;MultipleActiveResultSets=true"));
+
+builder.Services.AddDefaultIdentity<TrabalhoFinalDWEB2026.Models.Utente>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddEntityFrameworkStores<TrabalhoFinalDWEB2026.Data.ApplicationDbContext>();
 
 var app = builder.Build();
 
@@ -24,5 +32,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+app.MapRazorPages();
 
 app.Run();
