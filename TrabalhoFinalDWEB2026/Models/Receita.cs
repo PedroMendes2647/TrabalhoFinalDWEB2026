@@ -37,7 +37,7 @@ namespace TrabalhoFinalDWEB2026.Models {
         /// FK para o Utente/Paciente que vai receber a medicação (Classe Base)
         /// </summary>
         [Required]
-        [ForeignKey("MyUser")]
+        [ForeignKey("Utente")]
         [DisplayName("Paciente/Utente")]
         public string UtenteId { get; set; } = string.Empty;
         public virtual Utente? Utente { get; set; }
