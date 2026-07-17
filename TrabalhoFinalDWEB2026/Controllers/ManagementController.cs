@@ -39,23 +39,40 @@ namespace TrabalhoFinalDWEB2026.Controllers
             if (userRoles.Contains("Utente"))
             {
                 // Receitas do utilizador
-                receipts = _context.Receitas
+                receipts = await _context.Receitas
                     .Where(r => r.UtenteId == user.Id)
-                    .ToList();
+                    .Include(r => r.ListaDeMedicamentos)
+                    .ThenInclude(rm => rm.Medicamento)
+                    .Include(r => r.Utente)
+                    .Include(r => r.DoutorUtente)
+                    .Include(r => r.FarmaceutaUtente)
+                    .OrderByDescending(r => r.DataEmissao)
+                    .ToListAsync();
             }
             else if (userRoles.Contains("Doutor"))
             {
                 // Receitas emitidas pelo médico
-                receipts = _context.Receitas
+                receipts = await _context.Receitas
                     .Where(r => r.DoutorId == user.Id)
-                    .ToList();
+                    .Include(r => r.ListaDeMedicamentos)
+                    .ThenInclude(rm => rm.Medicamento)
+                    .Include(r => r.Utente)
+                    .Include(r => r.DoutorUtente)
+                    .Include(r => r.FarmaceutaUtente)
+                    .OrderByDescending(r => r.DataEmissao)
+                    .ToListAsync();
             }
             else if (userRoles.Contains("Farmaceuta"))
             {
-                // Receitas aviadas pelo farmacêutico
-                receipts = _context.Receitas
-                    .Where(r => r.FarmaceutaId == user.Id)
-                    .ToList();
+                // Todas as receitas disponíveis para aviamento
+                receipts = await _context.Receitas
+                    .Include(r => r.ListaDeMedicamentos)
+                    .ThenInclude(rm => rm.Medicamento)
+                    .Include(r => r.Utente)
+                    .Include(r => r.DoutorUtente)
+                    .Include(r => r.FarmaceutaUtente)
+                    .OrderByDescending(r => r.DataEmissao)
+                    .ToListAsync();
             }
 
             _logger.LogInformation("Utilizador {NumeroUtente} viu a lista de receitas", user.NumeroUtente);
@@ -172,6 +189,83 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
 
             return View(model);
+        }
+
+        /// <summary>
+        /// Visualiza o perfil de um utente específico
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> ViewUtenteProfile(string utenteId)
+        {
+            if (string.IsNullOrEmpty(utenteId))
+                return NotFound("Utente não encontrado.");
+
+            var utente = await _userManager.FindByIdAsync(utenteId);
+            if (utente == null)
+                return NotFound("Utente não encontrado.");
+
+            _logger.LogInformation("Utilizador visualizou perfil de {NumeroUtente}", utente.NumeroUtente);
+            return View(utente);
+        }
+
+        /// <summary>
+        /// Visualiza os detalhes de uma receita específica
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> ReceitaDetails(int receitaId)
+        {
+            var receita = await _context.Receitas
+                .Include(r => r.Utente)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
+                .Include(r => r.ListaDeMedicamentos)
+                    .ThenInclude(rm => rm.Medicamento)
+                .FirstOrDefaultAsync(r => r.Id == receitaId);
+
+            if (receita == null)
+                return NotFound("Receita não encontrada.");
+
+            _logger.LogInformation("Visualização de receita {ReceitaId}", receitaId);
+            return View(receita);
+        }
+
+        /// <summary>
+        /// Marca uma receita como aviada (dispensada) pelo farmacêutico
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DispenseReceita(int id)
+        {
+            var receita = await _context.Receitas.FindAsync(id);
+
+            if (receita == null)
+                return NotFound("Receita não encontrada.");
+
+            if (receita.Estado != "Emitida")
+            {
+                ModelState.AddModelError(string.Empty, $"Não consegue dispensar receita com o estado '{receita.Estado}'. Só receitas em estado 'Emitida' podem ser dispensadas.");
+                return RedirectToAction("ReceitaDetails", new { receitaId = id });
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(currentUser);
+
+            if (!userRoles.Contains("Farmaceuta"))
+            {
+                _logger.LogWarning("Utilizador com Id {UserId} não tem permissão Farmaceuta.", currentUser.Id);
+                return Forbid();
+            }
+
+            receita.Estado = "Aviada";
+            receita.FarmaceutaId = currentUser.Id;
+            receita.DataDispensacao = DateTime.Now;
+
+            _context.Receitas.Update(receita);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Farmacêutico {FarmaceutaId} dispensou a receita {ReceitaId}", currentUser.Id, id);
+
+            return RedirectToAction("ReceitaDetails", new { receitaId = id });
         }
     }
 

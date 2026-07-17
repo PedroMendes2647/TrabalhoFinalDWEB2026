@@ -47,15 +47,15 @@ namespace TrabalhoFinalDWEB2026.Data
 
             // Relacionamento: Quem passa a receita (Doutor)
             modelBuilder.Entity<Receita>()
-                .HasOne(r => r.Doutor)
-                .WithMany(u => u.ReceitasGiven)
+                .HasOne(r => r.DoutorUtente)
+                .WithMany()
                 .HasForeignKey(r => r.DoutorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Relacionamento: Quem avia a receita (Farmaceuta) 
             modelBuilder.Entity<Receita>()
-                .HasOne(r => r.Farmaceuta)
-                .WithMany(f => f.ReceitasAviadas)
+                .HasOne(r => r.FarmaceutaUtente)
+                .WithMany()
                 .HasForeignKey(r => r.FarmaceutaId)
                 .OnDelete(DeleteBehavior.Restrict);
 

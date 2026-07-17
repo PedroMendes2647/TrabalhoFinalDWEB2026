@@ -30,7 +30,7 @@
                                     <td>@receita.Id</td>
                                     <td>@receita.DataEmissao.ToString("dd/MM/yyyy")</td>
                                     <td>@receita.Utente?.Nome ?? "N/A"</td>
-                                    <td>@receita.Doutor?.Nome ?? "N/A"</td>
+                                    <td>@receita.DoutorUtente?.Nome ?? "N/A"</td>
                                     <td>
                                         @if (receita.DataDispensacao.HasValue)
                                         {
@@ -42,7 +42,7 @@
                                         }
                                     </td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-info">Ver Detalhes</a>
+                                        <a href="@Url.Action("ReceitaDetails", "Management", new { receitaId = receita.Id })" class="btn btn-sm btn-info">Ver Detalhes</a>
                                     </td>
                                 </tr>
                             }

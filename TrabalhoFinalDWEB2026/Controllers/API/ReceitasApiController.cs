@@ -20,8 +20,8 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         public async Task<ActionResult<IEnumerable<Receita>>> GetReceitas() {
             return await _context.Receitas
                 .Include(r => r.Utente)
-                .Include(r => r.Doutor)
-                .Include(r => r.Farmaceuta)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
                 .ToListAsync();
         }
 
@@ -32,8 +32,8 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         public async Task<ActionResult<Receita>> GetReceita(int id) {
             var receita = await _context.Receitas
                 .Include(r => r.Utente)
-                .Include(r => r.Doutor)
-                .Include(r => r.Farmaceuta)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
                 .Include(r => r.ListaDeMedicamentos)
                     .ThenInclude(rm => rm.Medicamento)
                 .FirstOrDefaultAsync(r => r.Id == id);

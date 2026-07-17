@@ -37,7 +37,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 .Include(r => r.Utente)
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
-                .Include(r => r.Doutor)
+                .Include(r => r.DoutorUtente)
                 .OrderByDescending(r => r.DataEmissao)
                 .ToListAsync();
 
@@ -54,8 +54,8 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 .Include(r => r.Utente)
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
-                .Include(r => r.Doutor)
-                .Include(r => r.Farmaceuta)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (receita == null)
@@ -112,17 +112,20 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// <summary>
         /// Lista todas as receitas já dispensadas (estado "Aviada")
         /// Ordenadas por data de dispensação mais recente
+        /// Apenas receitas aviadas por este farmacêutico
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> DispensedReceitas()
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+
             var receitasAviadas = await _context.Receitas
-                .Where(r => r.Estado == "Aviada")
+                .Where(r => r.Estado == "Aviada" && r.FarmaceutaId == currentUser.Id)
                 .Include(r => r.Utente)
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
-                .Include(r => r.Doutor)
-                .Include(r => r.Farmaceuta)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
                 .OrderByDescending(r => r.DataDispensacao)
                 .ToListAsync();
 
@@ -161,8 +164,8 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     .Include(r => r.Utente)
                     .Include(r => r.ListaDeMedicamentos)
                     .ThenInclude(rm => rm.Medicamento)
-                    .Include(r => r.Doutor)
-                    .Include(r => r.Farmaceuta)
+                    .Include(r => r.DoutorUtente)
+                    .Include(r => r.FarmaceutaUtente)
                     .FirstOrDefaultAsync(r => r.Id == receitaId);
 
                 if (receita != null)
@@ -176,8 +179,8 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 .Include(r => r.Utente)
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
-                .Include(r => r.Doutor)
-                .Include(r => r.Farmaceuta)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
                 .Where(r => r.Utente.NumeroUtente.Contains(searchQuery))
                 .ToListAsync();
 

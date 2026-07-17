@@ -31,7 +31,7 @@
                                     <td>@utente.Email</td>
                                     <td>@utente.DataNascimento.ToString("dd/MM/yyyy")</td>
                                     <td>
-                                        <a href="#" class="btn btn-sm btn-info">Ver Perfil</a>
+                                        <a href="@Url.Action("ViewUtenteProfile", "Management", new { utenteId = utente.Id })" class="btn btn-sm btn-info">Ver Perfil</a>
                                     </td>
                                 </tr>
                             }

@@ -84,8 +84,8 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 .Where(r => r.UtenteId == utenteId)
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
-                .Include(r => r.Doutor)
-                .Include(r => r.Farmaceuta)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
                 .OrderByDescending(r => r.DataEmissao)
                 .ToListAsync();
 

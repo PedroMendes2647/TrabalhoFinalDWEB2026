@@ -53,18 +53,18 @@ namespace TrabalhoFinalDWEB2026.Models {
         /// FK para o Médico que prescreveu a receita
         /// </summary>
         [Required]
-        [ForeignKey("Doutor")]
+        [ForeignKey("DoutorUtente")]
         [DisplayName("Doutor Prescritor")]
         public string DoutorId { get; set; } = string.Empty;
-        public virtual Doutor? Doutor { get; set; }
+        public virtual Utente? DoutorUtente { get; set; }
 
         /// <summary>
         /// FK para o Farmacêutico que efetuou o aviamento
         /// </summary>
-        [ForeignKey("Farmaceuta")]
+        [ForeignKey("FarmaceutaUtente")]
         [DisplayName("Farmacêuta Responsável")]
         public string? FarmaceutaId { get; set; }
-        public virtual Farmaceuta? Farmaceuta { get; set; }
+        public virtual Utente? FarmaceutaUtente { get; set; }
 
         /* *****************************************************
          ************* relações entre entidades M-N ************
