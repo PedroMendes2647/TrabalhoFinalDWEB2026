@@ -1,0 +1,116 @@
+﻿@model TrabalhoFinalDWEB2026.Controllers.RegisterModel
+
+@{
+    ViewData["Title"] = "Criar Nova Conta";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <h1 class="mb-4 text-center">Registo no Sistema</h1>
+
+            <!-- Card de Registo Principal -->
+            <section class="mb-5">
+                <div class="card">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Criar Perfil de Utente</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        @* Apresenta sumário de erros vindos do servidor (ex: Número de utente já registado) *@
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+
+                        <form asp-action="Register" asp-controller="Account" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <!-- Campo: Número de Utente -->
+                            <div class="mb-3">
+                                <label asp-for="NumeroUtente" class="form-label fw-bold">Número de Utente (SNS)</label>
+                                <input asp-for="NumeroUtente" class="form-control" placeholder="Introduza os 9 dígitos do SNS" required maxlength="9" />
+                                <span asp-validation-for="NumeroUtente" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Campo: Nome Completo -->
+                            <div class="mb-3">
+                                <label asp-for="Nome" class="form-label fw-bold">Nome Completo</label>
+                                <input asp-for="Nome" class="form-control" placeholder="Introduza o seu nome completo" required />
+                                <span asp-validation-for="Nome" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Campo: Data de Nascimento -->
+                            <div class="mb-3">
+                                <label asp-for="DataNascimento" class="form-label fw-bold">Data de Nascimento</label>
+                                <input asp-for="DataNascimento" type="date" class="form-control" required />
+                                <span asp-validation-for="DataNascimento" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Campo: Email -->
+                            <div class="mb-3">
+                                <label asp-for="Email" class="form-label fw-bold">Endereço Eletrónico (Email)</label>
+                                <input asp-for="Email" type="email" class="form-control" placeholder="exemplo@dominio.com" required />
+                                <span asp-validation-for="Email" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Campo: Password -->
+                            <div class="mb-3">
+                                <label asp-for="Password" class="form-label fw-bold">Palavra-passe</label>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Defina a sua senha" required />
+                                <span asp-validation-for="Password" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Campo: Confirmar Password -->
+                            <div class="mb-4">
+                                <label asp-for="ConfirmPassword" class="form-label fw-bold">Confirmar Palavra-passe</label>
+                                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Repita a senha definida" required />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Botão Submeter -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary fw-bold">
+                                    Concluir Registo de Utente
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer bg-light py-3 text-center">
+                        <p class="mb-0 text-secondary">
+                            Já possui uma conta ativa?
+                            <a asp-action="Login" asp-controller="Account" class="text-primary fw-bold text-decoration-none">
+                                Inicie sessão aqui
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: none;
+    }
+
+    .card-header {
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .form-control {
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        padding: 0.6rem 0.75rem;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

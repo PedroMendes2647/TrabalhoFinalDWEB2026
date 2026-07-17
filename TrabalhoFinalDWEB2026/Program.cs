@@ -1,5 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.Data;
 using TrabalhoFinalDWEB2026.Models;
 
@@ -10,7 +12,13 @@ var builder = WebApplication.CreateBuilder(args);
 /// <summary>
 /// Adiciona suporte para controladores MVC com vistas
 /// </summary>
-builder.Services.AddControllersWithViews();
+
+builder.Services.AddControllersWithViews(options => {
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 
 /// <summary>
 /// Configura o contexto de base de dados com SQL Server
@@ -134,11 +142,11 @@ app.MapControllers();
 app.MapStaticAssets();
 
 /// <summary>
-/// Define a rota por defeito para MVC
+/// Define a rota por defeito para MVC redirecionando para o Login
 /// </summary>
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 /// <summary>

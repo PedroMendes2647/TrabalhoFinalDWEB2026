@@ -1,11 +1,11 @@
+using Microsoft.AspNetCore.Authorization; // <-- ADICIONADO PARA O ALLOWANONYMOUS
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TrabalhoFinalDWEB2026.Models;
 
-namespace TrabalhoFinalDWEB2026.Controllers
-{
-    public class AccountController : Controller
-    {
+namespace TrabalhoFinalDWEB2026.Controllers {
+    [AllowAnonymous]
+    public class AccountController : Controller {
         private readonly UserManager<Utente> _userManager;
         private readonly SignInManager<Utente> _signInManager;
         private readonly RoleManager<IdentityRole<string>> _roleManager;
@@ -15,8 +15,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
             UserManager<Utente> userManager,
             SignInManager<Utente> signInManager,
             RoleManager<IdentityRole<string>> roleManager,
-            ILogger<AccountController> logger)
-        {
+            ILogger<AccountController> logger) {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
@@ -27,8 +26,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Apresenta o formulário de registo de novo utilizador
         /// </summary>
         [HttpGet]
-        public IActionResult Register()
-        {
+        public IActionResult Register() {
             return View();
         }
 
@@ -38,20 +36,17 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(RegisterModel model)
-        {
-            if (ModelState.IsValid)
-            {
+        public async Task<IActionResult> Register(RegisterModel model) {
+            if (ModelState.IsValid) {
                 // Verifica se NumeroUtente já existe
                 var existingUser = await _userManager.FindByNameAsync(model.NumeroUtente);
-                if (existingUser != null)
-                {
+                if (existingUser != null) {
                     ModelState.AddModelError("NumeroUtente", "Este Numero Utente já está registado.");
                     return View(model);
                 }
 
-                var user = new Utente
-                {
+                var user = new Utente {
+                    Id = model.NumeroUtente,
                     UserName = model.NumeroUtente,
                     NumeroUtente = model.NumeroUtente,
                     Nome = model.Nome,
@@ -61,11 +56,9 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
-                if (result.Succeeded)
-                {
+                if (result.Succeeded) {
                     // Atribui a role "Utente" a todos os novos registos
-                    if (!await _roleManager.RoleExistsAsync("Utente"))
-                    {
+                    if (!await _roleManager.RoleExistsAsync("Utente")) {
                         await _roleManager.CreateAsync(new IdentityRole<string>("Utente"));
                     }
                     await _userManager.AddToRoleAsync(user, "Utente");
@@ -77,8 +70,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
-                foreach (var error in result.Errors)
-                {
+                foreach (var error in result.Errors) {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
@@ -90,8 +82,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Apresenta o formulário de login
         /// </summary>
         [HttpGet]
-        public IActionResult Login()
-        {
+        public IActionResult Login() {
             return View();
         }
 
@@ -101,24 +92,20 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel model)
-        {
-            if (ModelState.IsValid)
-            {
+        public async Task<IActionResult> Login(LoginModel model) {
+            if (ModelState.IsValid) {
                 var result = await _signInManager.PasswordSignInAsync(
                     model.NumeroUtente,
                     model.Password,
                     model.RememberMe,
                     lockoutOnFailure: true);
 
-                if (result.Succeeded)
-                {
+                if (result.Succeeded) {
                     _logger.LogInformation("Utilizador autenticado com Numero Utente: {NumeroUtente}", model.NumeroUtente);
                     return RedirectToAction("Dashboard", "Utente");
                 }
 
-                if (result.IsLockedOut)
-                {
+                if (result.IsLockedOut) {
                     _logger.LogWarning("Conta bloqueada para Numero Utente: {NumeroUtente}", model.NumeroUtente);
                     ModelState.AddModelError(string.Empty, "Conta bloqueada. Tente novamente mais tarde.");
                     return View(model);
@@ -137,16 +124,14 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Logout()
-        {
+        public async Task<IActionResult> Logout() {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("Utilizador fez logout.");
             return RedirectToAction("Index", "Home");
         }
     }
 
-    public class RegisterModel
-    {
+    public class RegisterModel {
         public string NumeroUtente { get; set; } = string.Empty;
         public string Nome { get; set; } = string.Empty;
         public DateTime DataNascimento { get; set; }
@@ -155,8 +140,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         public string ConfirmPassword { get; set; } = string.Empty;
     }
 
-    public class LoginModel
-    {
+    public class LoginModel {
         public string NumeroUtente { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public bool RememberMe { get; set; }
