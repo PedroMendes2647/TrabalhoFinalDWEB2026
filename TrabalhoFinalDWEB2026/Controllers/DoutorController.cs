@@ -113,7 +113,8 @@ namespace TrabalhoFinalDWEB2026.Controllers
             // Impede que o médico crie receita para si próprio
             if (currentDoctor.Id == utenteId)
             {
-                return Forbid("Não pode criar receita para si próprio.");
+                ModelState.AddModelError(string.Empty, "Não pode criar receita para si próprio.");
+                return RedirectToAction("SearchUtente");
             }
 
             var medicamentos = await _context.Medicamentos.ToListAsync();
@@ -134,12 +135,9 @@ namespace TrabalhoFinalDWEB2026.Controllers
         public async Task<IActionResult> CreateReceita(string utenteId, CreateReceitaModel model)
         {
             var currentDoctor = await _userManager.GetUserAsync(User);
-            var currentDoutorEntity = await _context.Doutores.FirstOrDefaultAsync(d => d.Id == currentDoctor.Id);
-
-            if (currentDoutorEntity == null)
+            if (currentDoctor == null)
             {
-                _logger.LogWarning("Utilizador com role Doutor não é uma entidade Doutor. UserId: {UserId}", currentDoctor.Id);
-                return Forbid("Deve estar registado como Doutor para criar receitas.");
+                return RedirectToAction("Login", "Account");
             }
 
             var targetUtente = await _userManager.FindByIdAsync(utenteId);
@@ -151,7 +149,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
             // Impede que o médico crie receita para si próprio
             if (currentDoctor.Id == utenteId)
             {
-                return Forbid("Não pode criar receita para si próprio.");
+                return Forbid();
             }
 
             if (ModelState.IsValid)

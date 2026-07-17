@@ -1,0 +1,43 @@
+@model IEnumerable<TrabalhoFinalDWEB2026.Models.Medicamentos>
+
+@{
+    ViewData["Title"] = "Medicamentos Disponíveis";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Medicamentos Disponíveis</h1>
+
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var medicamento in Model)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">@medicamento.Nome</h5>
+                                    <p class="card-text">
+                                        <strong>Dosagem:</strong> @medicamento.Dosagem<br />
+                                        <strong>Tipo:</strong> @medicamento.Tipo
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    Nenhum medicamento encontrado.
+                </div>
+            }
+
+            <div class="mt-4">
+                <a href="@Url.Action("Index", "Dashboard")" class="btn btn-outline-secondary">Voltar ao Painel</a>
+            </div>
+        </div>
+    </div>
+</div>

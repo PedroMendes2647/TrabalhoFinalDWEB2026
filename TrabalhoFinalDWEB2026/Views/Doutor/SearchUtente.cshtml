@@ -1,0 +1,68 @@
+@{
+    ViewData["Title"] = "Pesquisar Paciente";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-search"></i> Pesquisar Paciente
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="SearchUtente">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label for="numeroUtente" class="form-label">Número de Utente (SNS)</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="numeroUtente" 
+                                   name="numeroUtente" 
+                                   placeholder="Introduza o número de utente"
+                                   required
+                                   maxlength="9"
+                                   pattern="[0-9]{9}">
+                            <small class="text-muted">Digite os 9 dígitos do número de utente</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Pesquisar
+                            </button>
+                            <a href="@Url.Action("Index", "Dashboard")" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar ao Painel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger mt-3" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> @ViewBag.Error
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+
+    .form-control:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+</style>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
