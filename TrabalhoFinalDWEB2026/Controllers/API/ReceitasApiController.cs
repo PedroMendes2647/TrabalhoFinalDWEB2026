@@ -13,7 +13,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             _context = context;
         }
 
-        //GET: api/ReceitasApi
+        /// <summary>
+        /// Obtém a lista completa de todas as receitas com as relações associadas
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Receita>>> GetReceitas() {
             return await _context.Receitas
@@ -23,7 +25,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
                 .ToListAsync();
         }
 
-        //GET: api/ReceitasApi/X
+        /// <summary>
+        /// Obtém uma receita específica pelo ID com todos os seus medicamentos associados
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<Receita>> GetReceita(int id) {
             var receita = await _context.Receitas
@@ -38,7 +42,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             return receita;
         }
 
-        // POST: api/ReceitasApi
+        /// <summary>
+        /// Cria uma nova receita com medicamentos associados
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<Receita>> PostReceita(ReceitaInputDto input) {
             if (!ModelState.IsValid) {
@@ -55,6 +61,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             _context.Receitas.Add(receita);
             await _context.SaveChangesAsync();
 
+            // Adiciona os medicamentos à receita
             if (input.Medicamentos != null) {
                 foreach (var medInput in input.Medicamentos) {
                     var receitaMedicamento = new ReceitaMedicamentos {
@@ -71,7 +78,10 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             return CreatedAtAction(nameof(GetReceita), new { id = receita.Id }, receita);
         }
 
-        //PUT: api/ReceitasApi/X
+        /// <summary>
+        /// Atualiza os dados de uma receita e seus medicamentos associados.
+        /// Restrição: Não permite editar receitas já aviadas pelo farmacêutico.
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReceita(int id, ReceitaInputDto input) {
             var receita = await _context.Receitas
@@ -115,7 +125,10 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             return Ok(new { mensagem = "Receita e medicamentos associados atualizados com sucesso!" });
         }
 
-        //DELETE: api/ReceitasApi/X
+        /// <summary>
+        /// Elimina uma receita.
+        /// Restrição: Não permite eliminar receitas já entregues/aviadas pelo farmacêutico.
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReceita(int id) {
             var receita = await _context.Receitas.FindAsync(id);

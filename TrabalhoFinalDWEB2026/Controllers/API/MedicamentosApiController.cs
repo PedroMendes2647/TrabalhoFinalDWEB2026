@@ -14,13 +14,18 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         }
 
 
-        //GET: api/MedicamentosApi
+
+        /// <summary>
+        ///  Obtem uma lista de medicamentos 
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Medicamentos>>> GetMedicamentos() {
             return await _context.Medicamentos.ToListAsync();
         }
 
-        // GET: api/MedicamentosApi/X
+        /// <summary>
+        /// Obtém um medicamento específico pelo ID
+        /// </summary>
         [HttpGet("{id}")]
         public async Task<ActionResult<Medicamentos>> GetMedicamento(int id) {
             var medicamento = await _context.Medicamentos.FindAsync(id);
@@ -28,7 +33,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             return medicamento;
         }
 
-        // POST: api/MedicamentosApi
+        /// <summary>
+        /// Cria um novo medicamento
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<Medicamentos>> PostMedicamento(Medicamentos medicamento) {
             if (!ModelState.IsValid) {
@@ -41,7 +48,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             return CreatedAtAction(nameof(GetMedicamento), new { id = medicamento.Id }, medicamento);
         }
 
-        // PUT: api/MedicamentosApi/5
+        /// <summary>
+        /// Atualiza os dados de um medicamento existente
+        /// </summary>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMedicamento(int id, Medicamentos medicamento) {
             if (id != medicamento.Id) {
@@ -66,8 +75,10 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             return Ok(new { mensagem = "Medicamento atualizado com sucesso!" });
         }
 
-        
-        //DELETE: api/MedicamentosApi/
+        /// <summary>
+        /// Elimina um medicamento. Não permite eliminar medicamentos associados a receitas ativas.
+        /// Regra de Negócio: Protección de referencial integrity
+        /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMedicamento(int id) {
             var medicamento = await _context.Medicamentos.FindAsync(id);
@@ -75,7 +86,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
                 return NotFound(new { mensagem = "Medicamento não encontrado." });
             }
 
-            // Regra de Negócio: Não deixar eliminar um medicamento que esteja associado a alguma receita ativa
+            // Verifica se o medicamento está associado a alguma receita
             var associadoReceita = await _context.ReceitaMedicamentos.AnyAsync(rm => rm.MedicamentoId == id);
             if (associadoReceita) {
                 return BadRequest(new { mensagem = "Não é possível eliminar este medicamento porque ele está associado a receitas existentes." });

@@ -23,23 +23,30 @@ namespace TrabalhoFinalDWEB2026.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Apresenta o formulário de registo de novo utilizador
+        /// </summary>
         [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
+        /// <summary>
+        /// Processa o registo de um novo utilizador
+        /// Verifica se o NumeroUtente já existe, cria o utilizador e atribui a role "Utente"
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model)
         {
             if (ModelState.IsValid)
             {
-                // Check if NumeroUtente already exists
+                // Verifica se NumeroUtente já existe
                 var existingUser = await _userManager.FindByNameAsync(model.NumeroUtente);
                 if (existingUser != null)
                 {
-                    ModelState.AddModelError("NumeroUtente", "This Numero Utente is already registered.");
+                    ModelState.AddModelError("NumeroUtente", "Este Numero Utente já está registado.");
                     return View(model);
                 }
 
@@ -56,16 +63,16 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
                 if (result.Succeeded)
                 {
-                    // Assign the "Utente" role to all new registrations
+                    // Atribui a role "Utente" a todos os novos registos
                     if (!await _roleManager.RoleExistsAsync("Utente"))
                     {
                         await _roleManager.CreateAsync(new IdentityRole<string>("Utente"));
                     }
                     await _userManager.AddToRoleAsync(user, "Utente");
 
-                    _logger.LogInformation("User created a new account with Numero Utente: {NumeroUtente}", model.NumeroUtente);
+                    _logger.LogInformation("Novo utilizador criado com Numero Utente: {NumeroUtente}", model.NumeroUtente);
 
-                    // Sign in after successful registration
+                    // Faz login automático após registo bem-sucedido
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Home");
                 }
@@ -79,12 +86,19 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Apresenta o formulário de login
+        /// </summary>
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
+        /// <summary>
+        /// Processa o login do utilizador pelo NumeroUtente
+        /// Suporta "Lembrar-me" e bloqueio de conta após múltiplas tentativas falhadas
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
@@ -99,31 +113,34 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User logged in with Numero Utente: {NumeroUtente}", model.NumeroUtente);
+                    _logger.LogInformation("Utilizador autenticado com Numero Utente: {NumeroUtente}", model.NumeroUtente);
                     return RedirectToAction("Dashboard", "Utente");
                 }
 
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out for Numero Utente: {NumeroUtente}", model.NumeroUtente);
-                    ModelState.AddModelError(string.Empty, "Account locked. Try again later.");
+                    _logger.LogWarning("Conta bloqueada para Numero Utente: {NumeroUtente}", model.NumeroUtente);
+                    ModelState.AddModelError(string.Empty, "Conta bloqueada. Tente novamente mais tarde.");
                     return View(model);
                 }
 
-                _logger.LogWarning("Failed login attempt for Numero Utente: {NumeroUtente}", model.NumeroUtente);
-                ModelState.AddModelError(string.Empty, "Invalid Numero Utente or password.");
+                _logger.LogWarning("Tentativa de login falhada para Numero Utente: {NumeroUtente}", model.NumeroUtente);
+                ModelState.AddModelError(string.Empty, "Numero Utente ou senha inválidos.");
                 return View(model);
             }
 
             return View(model);
         }
 
+        /// <summary>
+        /// Processa o logout do utilizador
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
+            _logger.LogInformation("Utilizador fez logout.");
             return RedirectToAction("Index", "Home");
         }
     }

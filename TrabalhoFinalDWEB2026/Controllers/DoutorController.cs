@@ -24,49 +24,60 @@ namespace TrabalhoFinalDWEB2026.Controllers
             _logger = logger;
         }
 
-        // Doctor dashboard
+        /// <summary>
+        /// Painel de controlo do médico
+        /// </summary>
         [HttpGet]
         public IActionResult Dashboard()
         {
             return View();
         }
 
-        // Search for a utente by NumeroUtente
+        /// <summary>
+        /// Apresenta o formulário para pesquisar um utilizador pelo NumeroUtente
+        /// </summary>
         [HttpGet]
         public IActionResult SearchUtente()
         {
             return View();
         }
 
+        /// <summary>
+        /// Processa a pesquisa de um utilizador pelo NumeroUtente
+        /// Redireciona para a página de detalhes do utilizador encontrado
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SearchUtente(string numeroUtente)
         {
             if (string.IsNullOrWhiteSpace(numeroUtente))
             {
-                ModelState.AddModelError("numeroUtente", "Please enter a Numero Utente.");
+                ModelState.AddModelError("numeroUtente", "Por favor, introduza um Número de Utente.");
                 return View();
             }
 
             var utente = await _userManager.FindByNameAsync(numeroUtente);
             if (utente == null)
             {
-                ModelState.AddModelError("numeroUtente", "Utente not found.");
+                ModelState.AddModelError("numeroUtente", "Utilizador não encontrado.");
                 return View();
             }
 
-            // Redirect to view that utente's details
+            // Redireciona para a página de detalhes do utilizador
             return RedirectToAction("ViewUtenteData", new { utenteId = utente.Id });
         }
 
-        // View another utente's data and receitas
+        /// <summary>
+        /// Visualiza os dados e receitas de um utilizador específico
+        /// Apenas acessível a médicos
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> ViewUtenteData(string utenteId)
         {
             var utente = await _userManager.FindByIdAsync(utenteId);
             if (utente == null)
             {
-                return NotFound("Utente not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             var receitas = await _context.Receitas
@@ -84,7 +95,10 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View(utente);
         }
 
-        // Create a new receita for another utente
+        /// <summary>
+        /// Apresenta o formulário para criar uma nova receita para um utilizador
+        /// Restrição: Um médico não pode criar receita para si próprio
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> CreateReceita(string utenteId)
         {
@@ -93,13 +107,13 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (targetUtente == null)
             {
-                return NotFound("Target Utente not found.");
+                return NotFound("Utilizador de destino não encontrado.");
             }
 
-            // Prevent doctor from creating receita for themselves
+            // Impede que o médico crie receita para si próprio
             if (currentDoctor.Id == utenteId)
             {
-                return Forbid("Cannot create receita for yourself.");
+                return Forbid("Não pode criar receita para si próprio.");
             }
 
             var medicamentos = await _context.Medicamentos.ToListAsync();
@@ -111,6 +125,10 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Processa a criação de uma nova receita para um utilizador
+        /// Adiciona os medicamentos à receita através da relação M:N
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReceita(string utenteId, CreateReceitaModel model)
@@ -120,20 +138,20 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (currentDoutorEntity == null)
             {
-                _logger.LogWarning("User with role Doutor is not a Doutor entity. UserId: {UserId}", currentDoctor.Id);
-                return Forbid("You must be registered as a Doutor to create receitas.");
+                _logger.LogWarning("Utilizador com role Doutor não é uma entidade Doutor. UserId: {UserId}", currentDoctor.Id);
+                return Forbid("Deve estar registado como Doutor para criar receitas.");
             }
 
             var targetUtente = await _userManager.FindByIdAsync(utenteId);
             if (targetUtente == null)
             {
-                return NotFound("Target Utente not found.");
+                return NotFound("Utilizador de destino não encontrado.");
             }
 
-            // Prevent doctor from creating receita for themselves
+            // Impede que o médico crie receita para si próprio
             if (currentDoctor.Id == utenteId)
             {
-                return Forbid("Cannot create receita for yourself.");
+                return Forbid("Não pode criar receita para si próprio.");
             }
 
             if (ModelState.IsValid)
@@ -149,7 +167,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 _context.Receitas.Add(receita);
                 await _context.SaveChangesAsync();
 
-                // Add medicamentos to the receita
+                // Adiciona os medicamentos à receita
                 if (model.MedicamentoIds != null && model.MedicamentoIds.Any())
                 {
                     foreach (var medicamentoId in model.MedicamentoIds)
@@ -169,7 +187,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                _logger.LogInformation("Doutor {DoutorId} created receita {ReceitaId} for Utente {UtenteId}", 
+                _logger.LogInformation("Médico {DoutorId} criou receita {ReceitaId} para utilizador {UtenteId}", 
                     currentDoctor.Id, receita.Id, utenteId);
 
                 return RedirectToAction("ViewUtenteData", new { utenteId });

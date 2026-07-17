@@ -24,11 +24,14 @@ namespace TrabalhoFinalDWEB2026.Controllers
             _logger = logger;
         }
 
-        // Pharmacist dashboard showing receitas to be dispensed
+        /// <summary>
+        /// Painel de controlo do farmacêutico
+        /// Mostra todas as receitas que ainda não foram dispensadas (estado "Emitida")
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
-            // Show all receitas that are in "Emitida" status (awaiting dispensing)
+            // Obtém todas as receitas ainda não dispensadas
             var receitasEmitidas = await _context.Receitas
                 .Where(r => r.Estado == "Emitida")
                 .Include(r => r.Utente)
@@ -41,7 +44,9 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View(receitasEmitidas);
         }
 
-        // View receita details
+        /// <summary>
+        /// Visualiza os detalhes de uma receita específica
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> ReceitaDetails(int id)
         {
@@ -55,13 +60,16 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (receita == null)
             {
-                return NotFound("Receita not found.");
+                return NotFound("Receita não encontrada.");
             }
 
             return View(receita);
         }
 
-        // Change receita status from "Emitida" to "Aviada"
+        /// <summary>
+        /// Altera o estado da receita de "Emitida" para "Aviada"
+        /// Registra qual farmacêutico efetuou a dispensação e a data
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DispenseReceita(int id)
@@ -70,12 +78,12 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (receita == null)
             {
-                return NotFound("Receita not found.");
+                return NotFound("Receita não encontrada.");
             }
 
             if (receita.Estado != "Emitida")
             {
-                ModelState.AddModelError(string.Empty, $"Cannot dispense a receita with status '{receita.Estado}'. Only 'Emitida' receitas can be dispensed.");
+                ModelState.AddModelError(string.Empty, $"Não consegue dispensar receita com o estado '{receita.Estado}'. Só receitas em estado 'Emitida' podem ser dispensadas.");
                 return RedirectToAction("ReceitaDetails", new { id });
             }
 
@@ -85,8 +93,8 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (currentFarmaceuta == null)
             {
-                _logger.LogWarning("User with role Farmaceuta is not a Farmaceuta entity. UserId: {UserId}", currentUser.Id);
-                return Forbid("You must be registered as a Farmaceuta to dispense receitas.");
+                _logger.LogWarning("Utilizador com Id {UserId} não está registado como Farmaceuta.", currentUser.Id);
+                return Forbid("Precisa de estar registado como Farmaceuta para dispensar receitas.");
             }
 
             receita.Estado = "Aviada";
@@ -96,12 +104,15 @@ namespace TrabalhoFinalDWEB2026.Controllers
             _context.Receitas.Update(receita);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Farmaceuta {FarmaceutaId} dispensed receita {ReceitaId}", currentUser.Id, id);
+            _logger.LogInformation("Farmacêutico {FarmaceutaId} dispensou a receita {ReceitaId}", currentUser.Id, id);
 
             return RedirectToAction("Dashboard");
         }
 
-        // View all dispended receitas
+        /// <summary>
+        /// Lista todas as receitas já dispensadas (estado "Aviada")
+        /// Ordenadas por data de dispensação mais recente
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> DispensedReceitas()
         {
@@ -118,26 +129,32 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View(receitasAviadas);
         }
 
-        // Search for a receita by numero utente or receita id
+        /// <summary>
+        /// Apresenta o formulário para pesquisar receitas
+        /// </summary>
         [HttpGet]
         public IActionResult Search()
         {
             return View();
         }
 
+        /// <summary>
+        /// Processa a pesquisa de receitas por ID ou número de utilizador
+        /// Permite pesquisar tanto por ID da receita como por NumeroUtente do paciente
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Search(string searchQuery)
         {
             if (string.IsNullOrWhiteSpace(searchQuery))
             {
-                ModelState.AddModelError("searchQuery", "Please enter a search term.");
+                ModelState.AddModelError("searchQuery", "Entre com um termo de busca.");
                 return View();
             }
 
             List<Receita> receitas = new List<Receita>();
 
-            // Try to search by receita ID
+            // Pesquisa por ID da receita
             if (int.TryParse(searchQuery, out int receitaId))
             {
                 var receita = await _context.Receitas
@@ -154,7 +171,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 }
             }
 
-            // Also search by Numero Utente
+            // Pesquisa por número de utilizador
             var utenteReceitas = await _context.Receitas
                 .Include(r => r.Utente)
                 .Include(r => r.ListaDeMedicamentos)
@@ -168,7 +185,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (!receitas.Any())
             {
-                ModelState.AddModelError("searchQuery", "No receitas found matching your search.");
+                ModelState.AddModelError("searchQuery", "Nenhuma receita encontrada que corresponda à sua pesquisa.");
                 return View();
             }
 

@@ -24,40 +24,47 @@ namespace TrabalhoFinalDWEB2026.Controllers
             _logger = logger;
         }
 
-        // Dashboard accessible to all authenticated users
+        /// <summary>
+        /// Painel de controlo acessível a todos os utilizadores autenticados
+        /// Apresenta informações do utilizador atual
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Dashboard()
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             return View(currentUser);
         }
 
-        // View personal data
+        /// <summary>
+        /// Permite visualizar os dados pessoais do utilizador
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> MyData()
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             return View(currentUser);
         }
 
-        // View personal receitas
+        /// <summary>
+        /// Lista todas as receitas do utilizador atual com medicamentos associados
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> MyReceitas()
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             var receitas = await _context.Receitas
@@ -72,14 +79,17 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View(receitas);
         }
 
-        // View receita details
+        /// <summary>
+        /// Visualiza os detalhes de uma receita específica
+        /// Apenas permite visualizar receitas do próprio utilizador ou se for Doutor/Farmaceuta
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> ReceitaDetails(int id)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             var receita = await _context.Receitas
@@ -91,10 +101,10 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             if (receita == null)
             {
-                return NotFound("Receita not found.");
+                return NotFound("Receita não encontrada.");
             }
 
-            // Only allow viewing own receitas or if doctor/pharmacist assigned
+            // Restrição: Apenas o utilizador, o doutor ou o farmaceuta podem ver a receita
             var userRoles = await _userManager.GetRolesAsync(currentUser);
             if (receita.UtenteId != currentUser.Id && 
                 !userRoles.Contains("Doutor") && 
@@ -106,19 +116,25 @@ namespace TrabalhoFinalDWEB2026.Controllers
             return View(receita);
         }
 
-        // Edit personal data
+        /// <summary>
+        /// Apresenta o formulário para editar os dados pessoais do utilizador
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> EditData()
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             return View(currentUser);
         }
 
+        /// <summary>
+        /// Processa a atualização dos dados pessoais do utilizador
+        /// Permite atualizar Nome, Data de Nascimento e Email
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditData(Utente model)
@@ -126,7 +142,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
             {
-                return NotFound("User not found.");
+                return NotFound("Utilizador não encontrado.");
             }
 
             if (ModelState.IsValid)
@@ -138,7 +154,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 var result = await _userManager.UpdateAsync(currentUser);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User updated their data. Numero Utente: {NumeroUtente}", currentUser.NumeroUtente);
+                    _logger.LogInformation("Utilizador atualizou seus dados. Número: {NumeroUtente}", currentUser.NumeroUtente);
                     return RedirectToAction("MyData");
                 }
 
