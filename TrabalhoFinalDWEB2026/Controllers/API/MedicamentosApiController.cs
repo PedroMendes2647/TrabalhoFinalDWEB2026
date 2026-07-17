@@ -16,7 +16,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
 
 
         /// <summary>
-        ///  Obtem uma lista de medicamentos 
+        ///  Obtém uma lista de medicamentos 
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Medicamentos>>> GetMedicamentos() {
