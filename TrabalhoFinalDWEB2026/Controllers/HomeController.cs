@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TrabalhoFinalDWEB2026.Models;
 
 namespace TrabalhoFinalDWEB2026.Controllers {
+    [AllowAnonymous]
     public class HomeController : Controller {
         /// <summary>
         /// Página inicial da aplicação

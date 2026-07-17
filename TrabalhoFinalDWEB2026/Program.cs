@@ -13,12 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 /// Adiciona suporte para controladores MVC com vistas
 /// </summary>
 
-builder.Services.AddControllersWithViews(options => {
-    var policy = new AuthorizationPolicyBuilder()
-        .RequireAuthenticatedUser()
-        .Build();
-    options.Filters.Add(new AuthorizeFilter(policy));
-});
+builder.Services.AddControllersWithViews();
 
 /// <summary>
 /// Configura o contexto de base de dados com SQL Server
@@ -142,11 +137,11 @@ app.MapControllers();
 app.MapStaticAssets();
 
 /// <summary>
-/// Define a rota por defeito para MVC redirecionando para o Login
+/// Define a rota por defeito para MVC redirecionando para o Index da Home
 /// </summary>
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}")
+    pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 /// <summary>

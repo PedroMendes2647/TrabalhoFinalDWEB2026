@@ -1,0 +1,130 @@
+@model TrabalhoFinalDWEB2026.Models.Utente
+
+@{
+    ViewData["Title"] = "Painel do Médico";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-badge"></i> Bem-vindo, Dr. @Model?.Nome
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <strong>Código de Médico:</strong> @Model?.NumeroUtente
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-file-text"></i> Emitir Receita
+                                    </h5>
+                                    <p class="card-text">Criar e emitir novas receitas médicas</p>
+                                    <a href="#" class="btn btn-success">Nova Receita</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-list-check"></i> Minhas Receitas
+                                    </h5>
+                                    <p class="card-text">Consulte as receitas emitidas</p>
+                                    <a href="#" class="btn btn-success">Ver Receitas</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-people"></i> Utentes
+                                    </h5>
+                                    <p class="card-text">Consulte a lista de utentes</p>
+                                    <a href="#" class="btn btn-success">Ver Utentes</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-capsule"></i> Medicamentos Disponíveis
+                                    </h5>
+                                    <p class="card-text">Consulte medicamentos disponíveis</p>
+                                    <a href="#" class="btn btn-success">Ver Medicamentos</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-person-vcard"></i> Perfil
+                                    </h5>
+                                    <p class="card-text">Gerencie as suas informações profissionais</p>
+                                    <a href="#" class="btn btn-success">Editar Perfil</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-shield-lock"></i> Segurança
+                                    </h5>
+                                    <p class="card-text">Altere a sua palavra-passe</p>
+                                    <a href="#" class="btn btn-success">Alterar Palavra-passe</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Secção de informações profissionais *@
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6>Informações Profissionais</h6>
+                        <p><strong>Email:</strong> @Model?.Email</p>
+                        <p><strong>Data de Registo:</strong> @Model?.DataNascimento.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+        color: #198754;
+        font-weight: 600;
+    }
+
+    .bi {
+        margin-right: 8px;
+    }
+</style>

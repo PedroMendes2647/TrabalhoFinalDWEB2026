@@ -102,7 +102,7 @@ namespace TrabalhoFinalDWEB2026.Controllers {
 
                 if (result.Succeeded) {
                     _logger.LogInformation("Utilizador autenticado com Numero Utente: {NumeroUtente}", model.NumeroUtente);
-                    return RedirectToAction("Dashboard", "Utente");
+                    return RedirectToAction("Index", "Dashboard");
                 }
 
                 if (result.IsLockedOut) {

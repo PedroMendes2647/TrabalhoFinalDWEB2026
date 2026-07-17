@@ -27,6 +27,21 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="About">Acerca de</a>
                         </li>
                     </ul>
+                    <div class="d-flex gap-2">
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <span class="navbar-text me-3">
+                                Bem-vindo, <strong>@User.Identity?.Name</strong>
+                            </span>
+                            <form method="post" asp-controller="Account" asp-action="Logout" style="display: inline;">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Terminar Sessão</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-primary btn-sm" asp-controller="Account" asp-action="Login">Iniciar Sessão</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
