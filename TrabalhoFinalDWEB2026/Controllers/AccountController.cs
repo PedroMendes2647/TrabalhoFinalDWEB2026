@@ -83,6 +83,10 @@ namespace TrabalhoFinalDWEB2026.Controllers {
         /// </summary>
         [HttpGet]
         public IActionResult Login() {
+            // Se o utilizador já está autenticado, redireciona para a página inicial
+            if (User.Identity?.IsAuthenticated ?? false) {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
 
