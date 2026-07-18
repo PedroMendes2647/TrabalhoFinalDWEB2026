@@ -27,7 +27,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// <summary>
         /// Ver todas as receitas baseado na função do utilizador
         /// </summary>
-        public async Task<IActionResult> ViewReceitas()
+        public async Task<IActionResult> ViewReceitas(string numeroUtente = "")
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -64,15 +64,31 @@ namespace TrabalhoFinalDWEB2026.Controllers
             }
             else if (userRoles.Contains("Farmaceuta"))
             {
-                // Todas as receitas disponíveis para aviamento
-                receipts = await _context.Receitas
-                    .Include(r => r.ListaDeMedicamentos)
-                    .ThenInclude(rm => rm.Medicamento)
-                    .Include(r => r.Utente)
-                    .Include(r => r.DoutorUtente)
-                    .Include(r => r.FarmaceutaUtente)
-                    .OrderByDescending(r => r.DataEmissao)
-                    .ToListAsync();
+                // Receitas pendentes para aviamento
+                if (!string.IsNullOrWhiteSpace(numeroUtente))
+                {
+                    var query = _context.Receitas
+                        .Include(r => r.ListaDeMedicamentos)
+                        .ThenInclude(rm => rm.Medicamento)
+                        .Include(r => r.Utente)
+                        .Include(r => r.DoutorUtente)
+                        .Include(r => r.FarmaceutaUtente)
+                        .Where(r => r.Estado == "Emitida")
+                        .Where(r => r.Utente.NumeroUtente.Contains(numeroUtente));
+
+                    receipts = await query
+                        .OrderByDescending(r => r.DataEmissao)
+                        .ToListAsync();
+
+                    // Passar o número de utente pesquisado para a view
+                    ViewBag.NumeroUtentePesquisado = numeroUtente;
+                }
+                else
+                {
+                    // Se não houver pesquisa, retorna lista vazia
+                    receipts = new List<Receita>();
+                    ViewBag.NumeroUtentePesquisado = "";
+                }
             }
 
             _logger.LogInformation("Utilizador {NumeroUtente} viu a lista de receitas", user.NumeroUtente);

@@ -2,12 +2,47 @@
 
 @{
     ViewData["Title"] = "Minhas Receitas";
+    var userRoles = ViewContext.HttpContext.User.Claims
+        .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+        .Select(c => c.Value)
+        .ToList();
+    var isFarmaceuta = userRoles.Contains("Farmaceuta");
+    var numeroUtentePesquisado = ViewBag.NumeroUtentePesquisado as string ?? "";
 }
 
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">Minhas Receitas</h1>
+
+            @if (isFarmaceuta)
+            {
+                <div class="card mb-4 border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-search"></i> Pesquisar Receitas Pendentes</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="get" asp-action="ViewReceitas" class="row g-3">
+                            <div class="col-md-6">
+                                <label for="numeroUtente" class="form-label">Número de Utente</label>
+                                <input type="text" class="form-control" id="numeroUtente" name="numeroUtente" 
+                                       placeholder="Digite o número de utente..." value="@numeroUtentePesquisado">
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end gap-2">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-search"></i> Pesquisar
+                                </button>
+                                @if (!string.IsNullOrWhiteSpace(numeroUtentePesquisado))
+                                {
+                                    <a href="@Url.Action("ViewReceitas")" class="btn btn-secondary">
+                                        <i class="bi bi-x-circle"></i> Limpar
+                                    </a>
+                                }
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
 
             @if (Model.Any())
             {
@@ -53,7 +88,14 @@
             else
             {
                 <div class="alert alert-info">
-                    Nenhuma receita encontrada.
+                    @if (!string.IsNullOrWhiteSpace(numeroUtentePesquisado))
+                    {
+                        <text>Nenhuma receita pendente encontrada para o número de utente <strong>@numeroUtentePesquisado</strong>.</text>
+                    }
+                    else
+                    {
+                        <text>Nenhuma receita encontrada.</text>
+                    }
                 </div>
             }
 
