@@ -25,7 +25,38 @@ namespace TrabalhoFinalDWEB2026.Controllers
         }
 
         /// <summary>
-        /// Ver todas as receitas baseado na função do utilizador
+        /// Ver receitas aviadas (dispensadas) - apenas para farmacêuticos
+        /// </summary>
+        public async Task<IActionResult> ViewAviacoes()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return RedirectToAction("Login", "Account");
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            if (!userRoles.Contains("Farmaceuta"))
+            {
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            // Receitas aviadas (dispensadas)
+            var receitas = await _context.Receitas
+                .Include(r => r.ListaDeMedicamentos)
+                .ThenInclude(rm => rm.Medicamento)
+                .Include(r => r.Utente)
+                .Include(r => r.DoutorUtente)
+                .Include(r => r.FarmaceutaUtente)
+                .Where(r => r.Estado == "Aviada")
+                .OrderByDescending(r => r.DataDispensacao)
+                .ToListAsync();
+
+            _logger.LogInformation("Utilizador {NumeroUtente} viu a lista de receitas aviadas", user.NumeroUtente);
+            return View(receitas);
+        }
+
+        /// <summary>
+        /// Ver receitas pendentes de aviamento - apenas para farmacêuticos
         /// </summary>
         public async Task<IActionResult> ViewReceitas(string numeroUtente = "")
         {
