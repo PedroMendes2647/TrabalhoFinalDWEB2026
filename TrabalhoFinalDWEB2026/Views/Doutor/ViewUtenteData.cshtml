@@ -137,6 +137,23 @@
                                                     <a href="#" class="btn btn-sm btn-info" title="Ver Detalhes">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
+                                                    @if (receita.Estado != "Aviada")
+                                                    {
+                                                        <form method="post" action="@Url.Action("DeleteReceita", "Doutor")" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="receitaId" value="@receita.Id" />
+                                                            <input type="hidden" name="utenteId" value="@utente.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-danger" title="Deletar Receita" onclick="return confirm('Tem a certeza que deseja deletar esta receita?');">
+                                                                <i class="bi bi-trash"></i> Apagar
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                    else
+                                                    {
+                                                        <button type="button" class="btn btn-sm btn-secondary" disabled title="Não pode apagar receitas aviadas">
+                                                            <i class="bi bi-trash"></i> Apagar
+                                                        </button>
+                                                    }
                                                 </td>
                                             </tr>
                                         }
