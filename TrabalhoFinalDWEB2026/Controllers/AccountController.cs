@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization; // <-- ADICIONADO PARA O ALLOWANONYMOUS
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using TrabalhoFinalDWEB2026.Models;
 
 namespace TrabalhoFinalDWEB2026.Controllers {
@@ -38,6 +39,17 @@ namespace TrabalhoFinalDWEB2026.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model) {
             if (ModelState.IsValid) {
+                // Verifica se a pessoa tem pelo menos 13 anos
+                var age = DateTime.Today.Year - model.DataNascimento.Year;
+                if (model.DataNascimento.Date > DateTime.Today.AddYears(-age)) {
+                    age--;
+                }
+
+                if (age < 13) {
+                    ModelState.AddModelError("DataNascimento", "Deve ter pelo menos 13 anos para se registar.");
+                    return View(model);
+                }
+
                 // Verifica se NumeroUtente já existe
                 var existingUser = await _userManager.FindByNameAsync(model.NumeroUtente);
                 if (existingUser != null) {
@@ -138,6 +150,7 @@ namespace TrabalhoFinalDWEB2026.Controllers {
     public class RegisterModel {
         public string NumeroUtente { get; set; } = string.Empty;
         public string Nome { get; set; } = string.Empty;
+        [MinAge(13, ErrorMessage = "Deve ter pelo menos 13 anos para se registar.")]
         public DateTime DataNascimento { get; set; }
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
@@ -148,5 +161,31 @@ namespace TrabalhoFinalDWEB2026.Controllers {
         public string NumeroUtente { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public bool RememberMe { get; set; }
+    }
+
+    /// <summary>
+    /// Validação customizada para verificar a idade mínima
+    /// </summary>
+    public class MinAgeAttribute : ValidationAttribute {
+        private readonly int _minAge;
+
+        public MinAgeAttribute(int minAge) {
+            _minAge = minAge;
+        }
+
+        protected override ValidationResult IsValid(object value, ValidationContext validationContext) {
+            if (value is DateTime birthDate) {
+                var age = DateTime.Today.Year - birthDate.Year;
+                if (birthDate.Date > DateTime.Today.AddYears(-age)) {
+                    age--;
+                }
+
+                if (age < _minAge) {
+                    return new ValidationResult($"Deve ter pelo menos {_minAge} anos.");
+                }
+            }
+
+            return ValidationResult.Success;
+        }
     }
 }
