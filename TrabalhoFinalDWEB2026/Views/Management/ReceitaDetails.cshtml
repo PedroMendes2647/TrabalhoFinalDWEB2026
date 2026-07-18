@@ -1,0 +1,204 @@
+@model TrabalhoFinalDWEB2026.Models.Receita
+
+@{
+    ViewData["Title"] = "Detalhes da Receita";
+    var userRoles = ViewContext.HttpContext.User.Claims
+        .Where(c => c.Type == System.Security.Claims.ClaimTypes.Role)
+        .Select(c => c.Value)
+        .ToList();
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <a href="@Url.Action("ViewReceitas", "Management")" class="btn btn-secondary mb-3">
+                <i class="bi bi-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-success mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-file-text"></i> Receita #@Model.Id
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Data de Emissão:</strong>
+                            <p>@Model.DataEmissao.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Estado:</strong>
+                            <p>
+                                @if (Model.Estado == "Emitida")
+                                {
+                                    <span class="badge bg-warning">Pendente</span>
+                                }
+                                else if (Model.Estado == "Aviada")
+                                {
+                                    <span class="badge bg-success">Aviada</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@Model.Estado</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+
+                    @if (Model.DataDispensacao.HasValue)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Data de Dispensação:</strong>
+                                <p>@Model.DataDispensacao.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card border-info mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Envolvidos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Paciente/Utente:</strong>
+                            <p>
+                                @if (Model.Utente != null)
+                                {
+                                    <a href="@Url.Action("ViewUtenteProfile", "Management", new { utenteId = Model.Utente.Id })">
+                                        @Model.Utente.Nome (@Model.Utente.NumeroUtente)
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">N/A</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Médico Prescritor:</strong>
+                            <p>@(Model.DoutorUtente?.Nome ?? "N/A")</p>
+                        </div>
+                    </div>
+
+                    @if (Model.FarmaceutaUtente != null)
+                    {
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <strong>Farmacêutico Responsável:</strong>
+                                <p>@Model.FarmaceutaUtente.Nome</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-capsule"></i> Medicamentos Receitados</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.ListaDeMedicamentos != null && Model.ListaDeMedicamentos.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Medicamento</th>
+                                        <th>Quantidade</th>
+                                        <th>Tipo</th>
+                                        <th>Dosagem</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var med in Model.ListaDeMedicamentos)
+                                    {
+                                        <tr>
+                                            <td>@(med.Medicamento?.Nome ?? "N/A")</td>
+                                            <td>@med.Quantidade</td>
+                                            <td>@(med.Medicamento?.Tipo ?? "N/A")</td>
+                                            <td>@(med.Medicamento?.Dosagem ?? "N/A")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            Nenhum medicamento registado para esta receita.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-secondary mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Resumo</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>ID da Receita:</strong><br>
+                        <small class="text-muted">@Model.Id</small>
+                    </p>
+                    <hr>
+                    <p class="mb-2">
+                        <strong>Total de Medicamentos:</strong><br>
+                        <span class="badge bg-info">@(Model.ListaDeMedicamentos?.Count ?? 0)</span>
+                    </p>
+                    <hr>
+                    <p class="mb-2">
+                        <strong>Status da Dispensação:</strong><br>
+                        @if (Model.DataDispensacao.HasValue)
+                        {
+                            <span class="badge bg-success">Dispensada</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">Pendente</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            @if (userRoles.Contains("Farmaceuta") && Model.Estado == "Emitida")
+            {
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-check-circle"></i> Ação</h5>
+                    </div>
+                    <div class="card-body d-grid gap-2">
+                        <form method="post" action="@Url.Action("DispenseReceita", "Management", new { id = Model.Id })">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-check-circle"></i> Marcar como Aviada
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="@Url.Action("ViewReceitas", "Management")" class="btn btn-secondary">
+                <i class="bi bi-list"></i> Ver Todas as Receitas
+            </a>
+            <a href="@Url.Action("Index", "Dashboard")" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Painel
+            </a>
+        </div>
+    </div>
+</div>

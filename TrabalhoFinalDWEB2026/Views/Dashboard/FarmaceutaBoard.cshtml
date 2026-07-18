@@ -1,0 +1,118 @@
+@model TrabalhoFinalDWEB2026.Models.Utente
+
+@{
+    ViewData["Title"] = "Painel do Farmacêutico";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shop"></i> Bem-vindo, @Model?.Nome
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <strong>Código de Farmacêutico:</strong> @Model?.NumeroUtente
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-file-list"></i> Receitas Pendentes
+                                    </h5>
+                                    <p class="card-text">Consulte receitas para aviação</p>
+                                    <a href="@Url.Action("ViewReceitas", "Management")" class="btn btn-warning">Ver Receitas</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-prescription2"></i> Aviações de Receita
+                                    </h5>
+                                    <p class="card-text">Aviações de receitas realizadas</p>
+                                    <a href="@Url.Action("ViewAviacoes", "Management")" class="btn btn-warning">Ver Aviações</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-capsule"></i> Medicamentos
+                                    </h5>
+                                    <p class="card-text">Gerencie o inventário de medicamentos</p>
+                                    <a href="@Url.Action("ViewMedicamentos", "Management")" class="btn btn-warning">Ver Medicamentos</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-person-vcard"></i> Perfil
+                                    </h5>
+                                    <p class="card-text">Gerencie as suas informações</p>
+                                    <a href="@Url.Action("EditPerfil", "Management")" class="btn btn-warning">Editar Perfil</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card text-center mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="bi bi-shield-lock"></i> Segurança
+                                    </h5>
+                                    <p class="card-text">Altere a sua palavra-passe</p>
+                                    <a href="@Url.Action("ChangePassword", "Management")" class="btn btn-warning">Alterar Palavra-passe</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Secção de informações profissionais *@
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6>Informações Profissionais</h6>
+                        <p><strong>Email:</strong> @Model?.Email</p>
+                        <p><strong>Data de Registo:</strong> @Model?.DataNascimento.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+
+    .card-title {
+        color: #664d03;
+        font-weight: 600;
+    }
+
+    .bi {
+        margin-right: 8px;
+    }
+</style>

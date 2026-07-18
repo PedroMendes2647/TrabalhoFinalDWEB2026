@@ -1,0 +1,90 @@
+@model TrabalhoFinalDWEB2026.Models.Utente
+
+@{
+    ViewData["Title"] = "Perfil do Utente";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-person-vcard"></i> Perfil do Utente
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Nome:</strong>
+                            <p>@Model.Nome</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Número de Utente:</strong>
+                            <p>@Model.NumeroUtente</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Email:</strong>
+                            <p>@Model.Email</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Data de Nascimento:</strong>
+                            <p>@Model.DataNascimento.ToString("dd/MM/yyyy")</p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Telefone:</strong>
+                            <p>@(Model.PhoneNumber ?? "Não informado")</p>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Email Confirmado:</strong>
+                            <p>
+                                @if (Model.EmailConfirmed)
+                                {
+                                    <span class="badge bg-success">Sim</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning">Não</span>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="@Url.Action("ViewUtentes", "Management")" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar à Lista
+                </a>
+                <a href="@Url.Action("Index", "Dashboard")" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> Painel
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-secondary">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Informações</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>ID do Utilizador:</strong><br>
+                        <small class="text-muted">@Model.Id</small>
+                    </p>
+                    <hr>
+                    <p class="mb-2">
+                        <strong>Username:</strong><br>
+                        <small>@Model.UserName</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+﻿@model TrabalhoFinalDWEB2026.Controllers.LoginModel
+
+@{
+    ViewData["Title"] = "Iniciar Sessão";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+
+            <h1 class="mb-4 text-center">Área de Autenticação</h1>
+
+            <!-- Card de Login Princpal -->
+            <section class="mb-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="mb-0">Acesso ao Portal Clínico</h5>
+                    </div>
+                    <div class="card-body p-4">
+
+                        @* Mostra erros gerais de login *@
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4" role="alert"></div>
+
+                        <form asp-action="Login" asp-controller="Account" method="post">
+                            @Html.AntiForgeryToken()
+
+                            <!-- Campo: Número de Utente -->
+                            <div class="mb-3">
+                                <label asp-for="NumeroUtente" class="form-label fw-bold">Número de Utente (Username)</label>
+                                <input asp-for="NumeroUtente" class="form-control" placeholder="Introduza o número de utilizador" required />
+                                <span asp-validation-for="NumeroUtente" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Campo: Password -->
+                            <div class="mb-4">
+                                <label asp-for="Password" class="form-label fw-bold">Palavra-passe</label>
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Introduza a sua senha" required />
+                                <span asp-validation-for="Password" class="text-danger fs-6 d-block mt-1"></span>
+                            </div>
+
+                            <!-- Botão Submeter -->
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary fw-bold">
+                                    Entrar no Sistema
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="card-footer bg-light py-3 text-center">
+                        <p class="mb-0 text-secondary">
+                            Ainda não tem conta registada?
+                            <a asp-action="Register" asp-controller="Account" class="text-primary fw-bold text-decoration-none">
+                                Registe-se aqui
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ajuda / Credenciais de Teste Rápidas -->
+            <section class="mb-5">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"> Credenciais de Acesso Iniciais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Paciente -->
+                            <div class="col-md-4 mb-2">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2"><small class="fw-bold">Utente / Paciente</small></div>
+                                    <div class="card-body py-2">
+                                        <small><strong>Nº:</strong> <code>000000001</code></small><br>
+                                        <small><strong>Pass:</strong> <code>Senha@123</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Médico -->
+                            <div class="col-md-4 mb-2">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2"><small class="fw-bold">Médico</small></div>
+                                    <div class="card-body py-2">
+                                        <small><strong>Nº:</strong> <code>000000002</code></small><br>
+                                        <small><strong>Pass:</strong> <code>Senha@123</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Farmacêutico -->
+                            <div class="col-md-4 mb-2">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2"><small class="fw-bold">Farmacêutico</small></div>
+                                    <div class="card-body py-2">
+                                        <small><strong>Nº:</strong> <code>000000003</code></small><br>
+                                        <small><strong>Pass:</strong> <code>Senha@123</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: none;
+    }
+
+    .card-header {
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.125);
+    }
+
+    code {
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    .form-control {
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        padding: 0.6rem 0.75rem;
+    }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

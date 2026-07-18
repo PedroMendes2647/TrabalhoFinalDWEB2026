@@ -1,0 +1,324 @@
+@{
+    ViewData["Title"] = "Sobre Esta Aplicação";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Sobre Esta Aplicação</h1>
+
+            <!-- Informações do Trabalho -->
+            <section class="mb-5">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"> Informações do Trabalho</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Curso:</strong> Engenharia Informática</p>
+                                <p><strong>Disciplina:</strong> Desenvolvimento Web (DWEB)</p>
+                                <p><strong>Ano Letivo:</strong> 2025/2026</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Tipo de Projeto:</strong> Trabalho Final</p>
+                                <p><strong>Semestre:</strong> 2º Semestre</p>
+                                <p><strong>Instituição:</strong> IPT</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Autores -->
+            <section class="mb-5">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"> Autores do Trabalho</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-light">
+                                    
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Nº 24346</td>
+                                        <td>Fernando Costa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nº 24843</td>
+                                        <td>Pedro Mendes</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tecnologias e Frameworks -->
+            <section class="mb-5">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"> Tecnologias, Frameworks e Bibliotecas Utilizadas</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Backend -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="fw-bold text-primary">Backend</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>.NET 10</strong>
+                                        <br><small class="text-muted">Framework de desenvolvimento</small>
+                                        <br><small><a href="https://dotnet.microsoft.com/" target="_blank">https://dotnet.microsoft.com/</a></small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>ASP.NET Core</strong>
+                                        <br><small class="text-muted">Framework web para construção de APIs REST</small>
+                                        <br><small><a href="https://learn.microsoft.com/en-us/aspnet/core/" target="_blank">https://learn.microsoft.com/en-us/aspnet/core/</a></small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Entity Framework Core</strong>
+                                        <br><small class="text-muted">ORM para acesso a base de dados</small>
+                                        <br><small><a href="https://learn.microsoft.com/en-us/ef/core/" target="_blank">https://learn.microsoft.com/en-us/ef/core/</a></small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>ASP.NET Core Identity</strong>
+                                        <br><small class="text-muted">Sistema de autenticação e autorização</small>
+                                        <br><small><a href="https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity/" target="_blank">https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity/</a></small>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Frontend & Database -->
+                            <div class="col-md-6 mb-4">
+                                <h6 class="fw-bold text-primary">Frontend & Base de Dados</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>Razor Pages / MVC</strong>
+                                        <br><small class="text-muted">Framework para criação de vistas</small>
+                                        <br><small><a href="https://learn.microsoft.com/en-us/aspnet/core/mvc/" target="_blank">https://learn.microsoft.com/en-us/aspnet/core/mvc/</a></small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Bootstrap 5</strong>
+                                        <br><small class="text-muted">Framework CSS para design responsivo</small>
+                                        <br><small><a href="https://getbootstrap.com/" target="_blank">https://getbootstrap.com/</a></small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>SQL Server (LocalDB)</strong>
+                                        <br><small class="text-muted">Sistema de gestão de base de dados relacional</small>
+                                        <br><small><a href="https://learn.microsoft.com/en-us/sql/database-engine/" target="_blank">https://learn.microsoft.com/en-us/sql/</a></small>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>jQuery & jQuery Validation</strong>
+                                        <br><small class="text-muted">Bibliotecas JavaScript para interatividade e validação</small>
+                                        <br><small><a href="https://jquery.com/" target="_blank">https://jquery.com/</a></small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <h6 class="fw-bold text-secondary mt-3">Notas sobre Dependências Externas:</h6>
+                        <ul>
+                            <li>Todas as bibliotecas NuGet utilizadas no projeto estão listadas no ficheiro <code>.csproj</code></li>
+                            <li>Comentários adicionais sobre uso de código de terceiros estão presentes junto do código onde são utilizadas</li>
+                            <li>As imagens e ícones utilizados são de origem livre ou criados especificamente para este projeto</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Credenciais de Acesso -->
+            <section class="mb-5">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"> Credenciais de Acesso Iniciais</h5>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="row">
+                            <!-- Utilizador Comum -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0">Utilizador (Paciente)</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2">
+                                                            <strong>Número de Utilizador:</strong><br>
+                                                            <code>000000001</code>
+                                                        </p>
+                                                        <p class="mb-2">
+                                                            <strong>Senha:</strong><br>
+                                                            <code>Senha@123</code>
+                                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Acesso:</strong><br>
+                                            Ver suas receitas e dados pessoais
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Médico -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"> Médico</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2">
+                                                            <strong>Número de Utilizador:</strong><br>
+                                                            <code>000000002</code>
+                                                        </p>
+                                                        <p class="mb-2">
+                                                            <strong>Senha:</strong><br>
+                                                            <code>Senha@123</code>
+                                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Acesso:</strong><br>
+                                            Pesquisar utilizadores, visualizar dados e criar receitas
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Farmacêutico -->
+                            <div class="col-md-6 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-header">
+                                        <h6 class="mb-0"> Farmacêutico</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2">
+                                                            <strong>Número de Utilizador:</strong><br>
+                                                            <code>000000003</code>
+                                                        </p>
+                                                        <p class="mb-2">
+                                                            <strong>Senha:</strong><br>
+                                                            <code>Senha@123</code>
+                                                        </p>
+                                        <p class="mb-0">
+                                            <strong>Acesso:</strong><br>
+                                            Visualizar e dispensar receitas, pesquisar por utilizador
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Funcionalidades da Aplicação -->
+            <section class="mb-5">
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"> Funcionalidades Principais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Para Utilizadores:</h6>
+                                <ul>
+                                    <li>Registo e autenticação</li>
+                                    <li>Visualizar dados pessoais</li>
+                                    <li>Visualizar suas receitas</li>
+                                    <li>Editar informações de perfil</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Para Médicos:</h6>
+                                <ul>
+                                    <li>Pesquisar utilizadores</li>
+                                    <li>Visualizar dados de utilizadores</li>
+                                    <li>Criar receitas para utilizadores</li>
+                                    <li>Associar medicamentos às receitas</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">Para Farmacêuticos:</h6>
+                                <ul>
+                                    <li>Visualizar receitas emitidas</li>
+                                    <li>Dispensar/avisar receitas</li>
+                                    <li>Pesquisar receitas por ID ou utilizador</li>
+                                    <li>Histórico de receitas dispensadas</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold">API REST:</h6>
+                                <ul>
+                                    <li>CRUD completo de medicamentos</li>
+                                    <li>CRUD completo de receitas</li>
+                                    <li>Endpoints em <code>/api/medicamentosapi</code></li>
+                                    <li>Endpoints em <code>/api/receitasapi</code></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Arquitetura da Aplicação -->
+            <section class="mb-5">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"> Arquitetura da Aplicação</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-3">Estrutura de Camadas:</h6>
+                        <ul>
+                            <li><strong>Camada de Apresentação:</strong> Vistas Razor Pages / MVC (Views)</li>
+                            <li><strong>Camada de Lógica de Negócio:</strong> Controladores (Controllers)</li>
+                            <li><strong>Camada de Dados:</strong> Entity Framework Core com SQL Server</li>
+                            <li><strong>Camada de Modelos:</strong> Entidades de Domínio (Models)</li>
+                            <li><strong>Camada de API:</strong> Controladores API REST</li>
+                        </ul>
+
+                        <h6 class="fw-bold mt-4 mb-3">Padrões Implementados:</h6>
+                        <ul>
+                            <li><strong>MVC:</strong> Separação de responsabilidades entre modelo, vista e controlador</li>
+                            <li><strong>Repository Pattern:</strong> Entity Framework Core atua como abstração de dados</li>
+                            <li><strong>Dependency Injection:</strong> Injeção de dependências no ASP.NET Core</li>
+                            <li><strong>Role-Based Authorization:</strong> Controlo de acesso baseado em papéis</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: none;
+    }
+
+    .card-header {
+        font-weight: 600;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.125);
+    }
+
+    .list-group-item {
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        padding: 1rem;
+    }
+
+    code {
+        background-color: #f8f9fa;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.25rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    section {
+        scroll-margin-top: 100px;
+    }
+</style>
