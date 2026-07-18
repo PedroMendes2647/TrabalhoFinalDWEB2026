@@ -201,6 +201,57 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             return View(model);
         }
+
+        /// <summary>
+        /// Deleta uma receita
+        /// Apenas o doutor que criou a receita pode deletá-la
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteReceita(int receitaId, string utenteId)
+        {
+            var currentDoctor = await _userManager.GetUserAsync(User);
+            if (currentDoctor == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var receita = await _context.Receitas.FindAsync(receitaId);
+            if (receita == null)
+            {
+                return NotFound("Receita não encontrada.");
+            }
+
+            // Verifica se o doutor é o criador da receita
+            if (receita.DoutorId != currentDoctor.Id)
+            {
+                return Forbid("Só pode deletar receitas que criou.");
+            }
+
+            try
+            {
+                // Remove os medicamentos associados à receita
+                var medicamentosReceita = await _context.ReceitaMedicamentos
+                    .Where(rm => rm.ReceitaId == receitaId)
+                    .ToListAsync();
+
+                _context.ReceitaMedicamentos.RemoveRange(medicamentosReceita);
+
+                // Remove a receita
+                _context.Receitas.Remove(receita);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Doutor {DoutorId} deletou receita {ReceitaId} do utilizador {UtenteId}",
+                    currentDoctor.Id, receitaId, utenteId);
+
+                return RedirectToAction("ViewUtenteData", new { utenteId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao deletar receita {ReceitaId}", receitaId);
+                return RedirectToAction("ViewUtenteData", new { utenteId });
+            }
+        }
     }
 
     public class CreateReceitaModel
