@@ -177,25 +177,69 @@ namespace TrabalhoFinalDWEB2026.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPerfil(Utente model)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-                return RedirectToAction("Login", "Account");
-
-            if (user.Id != model.Id)
-                return Forbid();
-
-            user.Nome = model.Nome;
-            user.Email = model.Email;
-            user.DataNascimento = model.DataNascimento;
-
-            var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
+            try
             {
-                _logger.LogInformation("Utilizador {NumeroUtente} atualizou o perfil", user.NumeroUtente);
-                return RedirectToAction("Index", "Dashboard");
-            }
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                    return RedirectToAction("Login", "Account");
 
-            return View(user);
+                if (user.Id != model.Id)
+                    return Forbid();
+
+                // Validar Email
+                if (string.IsNullOrWhiteSpace(model.Email))
+                {
+                    ModelState.AddModelError("Email", "O email é obrigatório.");
+                    return View(user);
+                }
+
+                // Validar formato de email
+                if (!model.Email.Contains("@") || !model.Email.Contains("."))
+                {
+                    ModelState.AddModelError("Email", "Por favor, introduza um email válido.");
+                    return View(user);
+                }
+
+                // Validar Data de Nascimento
+                if (model.DataNascimento == default(DateTime))
+                {
+                    ModelState.AddModelError("DataNascimento", "A data de nascimento é obrigatória.");
+                    return View(user);
+                }
+
+                if (model.DataNascimento > DateTime.Today)
+                {
+                    ModelState.AddModelError("DataNascimento", "A data de nascimento não pode ser no futuro.");
+                    return View(user);
+                }
+
+                if (!ModelState.IsValid)
+                    return View(user);
+
+                user.Nome = model.Nome;
+                user.Email = model.Email;
+                user.DataNascimento = model.DataNascimento;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("Utilizador {NumeroUtente} atualizou o perfil", user.NumeroUtente);
+                    return RedirectToAction("Index", "Dashboard");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao atualizar perfil do utilizador");
+                ModelState.AddModelError("", "Ocorreu um erro ao atualizar o perfil. Por favor, tente novamente.");
+                return View(model);
+            }
         }
 
         /// <summary>
