@@ -135,71 +135,99 @@ namespace TrabalhoFinalDWEB2026.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateReceita(string utenteId, CreateReceitaModel model)
         {
-            var currentDoctor = await _userManager.GetUserAsync(User);
-            if (currentDoctor == null)
+            try
             {
-                return RedirectToAction("Login", "Account");
-            }
-
-            var targetUtente = await _userManager.FindByIdAsync(utenteId);
-            if (targetUtente == null)
-            {
-                return NotFound("Utilizador de destino não encontrado.");
-            }
-
-            // Impede que o médico crie receita para si próprio
-            if (currentDoctor.Id == utenteId)
-            {
-                return Forbid();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var receita = new Receita
+                var currentDoctor = await _userManager.GetUserAsync(User);
+                if (currentDoctor == null)
                 {
-                    UtenteId = utenteId,
-                    DoutorId = currentDoctor.Id,
-                    DataEmissao = DateTime.Now,
-                    Estado = "Emitida"
-                };
-
-                _context.Receitas.Add(receita);
-                await _context.SaveChangesAsync();
-
-                // Adiciona os medicamentos à receita
-                if (model.MedicamentoIds != null && model.MedicamentoIds.Any())
-                {
-                    for (int i = 0; i < model.MedicamentoIds.Count; i++)
-                    {
-                        var medicamentoId = model.MedicamentoIds[i];
-                        var quantidade = (i < model.Quantidades.Count) ? model.Quantidades[i] : 1;
-
-                        var medicamento = await _context.Medicamentos.FindAsync(medicamentoId);
-                        if (medicamento != null)
-                        {
-                            var receitaMedicamento = new ReceitaMedicamentos
-                            {
-                                ReceitaId = receita.Id,
-                                MedicamentoId = medicamentoId,
-                                Quantidade = quantidade
-                            };
-                            _context.ReceitaMedicamentos.Add(receitaMedicamento);
-                        }
-                    }
-                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Login", "Account");
                 }
 
-                _logger.LogInformation("Médico {DoutorId} criou receita {ReceitaId} para utilizador {UtenteId}", 
-                    currentDoctor.Id, receita.Id, utenteId);
+                var targetUtente = await _userManager.FindByIdAsync(utenteId);
+                if (targetUtente == null)
+                {
+                    return NotFound("Utilizador de destino não encontrado.");
+                }
 
-                return RedirectToAction("ViewUtenteData", new { utenteId });
+                // Impede que o médico crie receita para si próprio
+                if (currentDoctor.Id == utenteId)
+                {
+                    ModelState.AddModelError("", "Não pode criar receita para si próprio.");
+                    var medicamentosError = await _context.Medicamentos.ToListAsync();
+                    ViewBag.UtenteId = utenteId;
+                    ViewBag.UtenteName = targetUtente.Nome;
+                    ViewBag.Medicamentos = medicamentosError;
+                    return View(model);
+                }
+
+                if (ModelState.IsValid)
+                {
+                    // Validar se tem pelo menos um medicamento
+                    if (model.MedicamentoIds == null || !model.MedicamentoIds.Any())
+                    {
+                        ModelState.AddModelError("", "Deve selecionar pelo menos um medicamento.");
+                        var medicamentos = await _context.Medicamentos.ToListAsync();
+                        ViewBag.UtenteId = utenteId;
+                        ViewBag.Medicamentos = medicamentos;
+                        return View(model);
+                    }
+
+                    var receita = new Receita
+                    {
+                        UtenteId = utenteId,
+                        DoutorId = currentDoctor.Id,
+                        DataEmissao = DateTime.Now,
+                        Estado = "Emitida"
+                    };
+
+                    _context.Receitas.Add(receita);
+                    await _context.SaveChangesAsync();
+
+                    // Adiciona os medicamentos à receita
+                    if (model.MedicamentoIds != null && model.MedicamentoIds.Any())
+                    {
+                        for (int i = 0; i < model.MedicamentoIds.Count; i++)
+                        {
+                            var medicamentoId = model.MedicamentoIds[i];
+                            var quantidade = (i < model.Quantidades.Count) ? model.Quantidades[i] : 1;
+
+                            var medicamento = await _context.Medicamentos.FindAsync(medicamentoId);
+                            if (medicamento != null)
+                            {
+                                var receitaMedicamento = new ReceitaMedicamentos
+                                {
+                                    ReceitaId = receita.Id,
+                                    MedicamentoId = medicamentoId,
+                                    Quantidade = quantidade
+                                };
+                                _context.ReceitaMedicamentos.Add(receitaMedicamento);
+                            }
+                        }
+                        await _context.SaveChangesAsync();
+                    }
+
+                    _logger.LogInformation("Médico {DoutorId} criou receita {ReceitaId} para utilizador {UtenteId}", 
+                        currentDoctor.Id, receita.Id, utenteId);
+
+                    return RedirectToAction("ViewUtenteData", new { utenteId });
+                }
+
+                var medicamentosReturn = await _context.Medicamentos.ToListAsync();
+                ViewBag.UtenteId = utenteId;
+                ViewBag.Medicamentos = medicamentosReturn;
+
+                return View(model);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao criar receita para utilizador {UtenteId}", utenteId);
+                ModelState.AddModelError("", "Ocorreu um erro ao processar o pedido. Por favor, tente novamente.");
 
-            var medicamentos = await _context.Medicamentos.ToListAsync();
-            ViewBag.UtenteId = utenteId;
-            ViewBag.Medicamentos = medicamentos;
-
-            return View(model);
+                var medicamentos = await _context.Medicamentos.ToListAsync();
+                ViewBag.UtenteId = utenteId;
+                ViewBag.Medicamentos = medicamentos;
+                return View(model);
+            }
         }
     }
 
