@@ -10,10 +10,14 @@ var builder = WebApplication.CreateBuilder(args);
 // ===== CONFIGURAÇÃO DE SERVIÇOS =====
 
 /// <summary>
-/// Adiciona suporte para controladores MVC com vistas
+/// Adiciona suporte para controladores MVC com vistas e força AUTENTICAÇÃO GLOBAL
 /// </summary>
-
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => {
+    var policy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+});
 
 /// <summary>
 /// Configura o contexto de base de dados com SQL Server
@@ -23,10 +27,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 /// <summary>
 /// Configura o sistema de Autenticação e Autorização ASP.NET Core Identity
-/// - Entidade de utilizador: Utente
-/// - Desativa confirmação de email obrigatória
-/// - Suporte para roles baseado em string
-/// - Armazenamento em Entity Framework Core
 /// </summary>
 builder.Services.AddDefaultIdentity<Utente>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole<string>>()
@@ -36,33 +36,22 @@ var app = builder.Build();
 
 // ===== SEEDING DE DADOS INICIAIS =====
 
-/// <summary>
-/// Inicializa as roles da aplicação no startup
-/// Cria as roles: Utente, Doutor, Farmaceuta se não existirem
-/// Cria os utilizadores de teste padrão com números de utilizador:
-/// - 000000001: Utilizador (Role: Utente)
-/// - 000000002: Médico (Role: Doutor)
-/// - 000000003: Farmacêutico (Role: Farmaceuta)
-/// </summary>
-using (var scope = app.Services.CreateScope())
-{
+using (var scope = app.Services.CreateScope()) {
     var services = scope.ServiceProvider;
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<string>>>();
     var userManager = services.GetRequiredService<UserManager<Utente>>();
+    // Injeta o contexto da base de dados para podermos criar os medicamentos
+    var context = services.GetRequiredService<ApplicationDbContext>();
 
-    // ===== CRIAR ROLES =====
+    // ===== 1. CRIAR ROLES =====
     string[] roles = { "Utente", "Doutor", "Farmaceuta" };
-    foreach (var role in roles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
+    foreach (var role in roles) {
+        if (!await roleManager.RoleExistsAsync(role)) {
             await roleManager.CreateAsync(new IdentityRole<string> { Id = Guid.NewGuid().ToString(), Name = role });
         }
     }
 
-    // ===== CRIAR UTILIZADORES DE TESTE PADRÃO =====
-
-    // Dados dos utilizadores de teste
+    // ===== 2. CRIAR UTILIZADORES DE TESTE PADRÃO =====
     var defaultUsers = new[]
     {
         new { NumeroUtente = "000000001", Nome = "Utilizador Teste", Role = "Utente", Password = "Senha@123" },
@@ -70,15 +59,10 @@ using (var scope = app.Services.CreateScope())
         new { NumeroUtente = "000000003", Nome = "Farmacêutico Teste", Role = "Farmaceuta", Password = "Senha@123" }
     };
 
-    foreach (var userData in defaultUsers)
-    {
-        // Verifica se o utilizador já existe
+    foreach (var userData in defaultUsers) {
         var existingUser = await userManager.FindByNameAsync(userData.NumeroUtente);
-        if (existingUser == null)
-        {
-            // Cria novo utilizador
-            var newUser = new Utente
-            {
+        if (existingUser == null) {
+            var newUser = new Utente {
                 Id = userData.NumeroUtente,
                 UserName = userData.NumeroUtente,
                 NumeroUtente = userData.NumeroUtente,
@@ -90,66 +74,63 @@ using (var scope = app.Services.CreateScope())
 
             var result = await userManager.CreateAsync(newUser, userData.Password);
 
-            if (result.Succeeded)
-            {
-                // Atribui a role ao utilizador
+            if (result.Succeeded) {
                 await userManager.AddToRoleAsync(newUser, userData.Role);
             }
         }
+    }
+
+    // ===== 3. CRIAR MEDICAMENTOS DE TESTE PADRÃO =====
+    // Verifica se a tabela de medicamentos está totalmente vazia antes de inserir
+    if (!context.Medicamentos.Any()) {
+        var medicamentos = new[]
+        {
+            new Medicamentos { Nome = "Paracetamol", Tipo = "Analgésico", Dosagem = "500mg" },
+            new Medicamentos { Nome = "Ibuprofeno", Tipo = "Anti-inflamatório", Dosagem = "400mg" },
+            new Medicamentos { Nome = "Amoxicilina", Tipo = "Antibiótico", Dosagem = "500mg" },
+            new Medicamentos { Nome = "Dipirona", Tipo = "Analgésico", Dosagem = "500mg" },
+            new Medicamentos { Nome = "Cetoconazol", Tipo = "Antifúngico", Dosagem = "200mg" },
+            new Medicamentos { Nome = "Omeprazol", Tipo = "Antiácido", Dosagem = "20mg" },
+            new Medicamentos { Nome = "Atorvastatina", Tipo = "Estatina", Dosagem = "10mg" },
+            new Medicamentos { Nome = "Metformina", Tipo = "Antidiabético", Dosagem = "500mg" },
+            new Medicamentos { Nome = "Losartano", Tipo = "Anti-hipertensivo", Dosagem = "50mg" },
+            new Medicamentos { Nome = "Captopril", Tipo = "Anti-hipertensivo", Dosagem = "25mg" },
+            new Medicamentos { Nome = "Sinvastatina", Tipo = "Estatina", Dosagem = "20mg" },
+            new Medicamentos { Nome = "Ranitidina", Tipo = "Antiácido H2", Dosagem = "150mg" }
+        };
+
+        foreach (var med in medicamentos) {
+            context.Medicamentos.Add(med);
+        }
+
+        await context.SaveChangesAsync();
     }
 }
 
 // ===== CONFIGURAÇÃO DO PIPELINE HTTP =====
 
-/// <summary>
-/// Configuração do pipeline de requisição HTTP
-/// </summary>
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-/// <summary>
-/// Redireciona requisições HTTP para HTTPS
-/// </summary>
 app.UseHttpsRedirection();
-
-/// <summary>
-/// Ativa o sistema de routing da aplicação
-/// </summary>
+app.UseStaticFiles(); 
 app.UseRouting();
 
-/// <summary>
-/// Ativa o middleware de autenticação e autorização
-/// Deve ser colocado antes de MapControllers e MapRazorPages
-/// </summary>
 app.UseAuthorization();
 
-/// <summary>
-/// Mapeia os controladores API e MVC
-/// Permite que requisições cheguem aos controladores decorados com [ApiController] e [Controller]
-/// </summary>
 app.MapControllers();
-
-/// <summary>
-/// Mapeia ficheiros estáticos (CSS, JS, imagens, etc.)
-/// </summary>
 app.MapStaticAssets();
 
 /// <summary>
-/// Define a rota por defeito para MVC redirecionando para o Index da Home
+/// Define a rota por defeito para MVC redirecionando para o LOGIN DO ACCOUNT CONTROLLER
 /// </summary>
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
 
-/// <summary>
-/// Mapeia as páginas Razor (se utilizadas no projeto)
-/// </summary>
 app.MapRazorPages();
 
-/// <summary>
-/// Inicia a aplicação e fica à escuta de requisições
-/// </summary>
 app.Run();

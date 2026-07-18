@@ -29,8 +29,8 @@
                                 <tr>
                                     <td>@receita.Id</td>
                                     <td>@receita.DataEmissao.ToString("dd/MM/yyyy")</td>
-                                    <td>@receita.Utente?.Nome ?? "N/A"</td>
-                                    <td>@receita.DoutorUtente?.Nome ?? "N/A"</td>
+                                    <td>@(receita.Utente?.Nome ?? "N/A")</td>
+                                    <td>@(receita.DoutorUtente?.Nome ?? "N/A")</td>
                                     <td>
                                         @if (receita.DataDispensacao.HasValue)
                                         {

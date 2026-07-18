@@ -82,6 +82,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
             var receitas = await _context.Receitas
                 .Where(r => r.UtenteId == utenteId)
+                .Include(r => r.Utente)
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
                 .Include(r => r.DoutorUtente)
@@ -168,8 +169,11 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 // Adiciona os medicamentos à receita
                 if (model.MedicamentoIds != null && model.MedicamentoIds.Any())
                 {
-                    foreach (var medicamentoId in model.MedicamentoIds)
+                    for (int i = 0; i < model.MedicamentoIds.Count; i++)
                     {
+                        var medicamentoId = model.MedicamentoIds[i];
+                        var quantidade = (i < model.Quantidades.Count) ? model.Quantidades[i] : 1;
+
                         var medicamento = await _context.Medicamentos.FindAsync(medicamentoId);
                         if (medicamento != null)
                         {
@@ -177,7 +181,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                             {
                                 ReceitaId = receita.Id,
                                 MedicamentoId = medicamentoId,
-                                Quantidade = model.Quantidade
+                                Quantidade = quantidade
                             };
                             _context.ReceitaMedicamentos.Add(receitaMedicamento);
                         }
@@ -202,6 +206,6 @@ namespace TrabalhoFinalDWEB2026.Controllers
     public class CreateReceitaModel
     {
         public List<int> MedicamentoIds { get; set; } = new List<int>();
-        public int Quantidade { get; set; } = 1;
+        public List<int> Quantidades { get; set; } = new List<int>();
     }
 }
