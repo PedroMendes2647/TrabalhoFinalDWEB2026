@@ -5,11 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.Data;
 using TrabalhoFinalDWEB2026.Models;
 
-namespace TrabalhoFinalDWEB2026.Controllers
-{
+namespace TrabalhoFinalDWEB2026.Controllers {
     [Authorize(Roles = "Doutor")]
-    public class DoutorController : Controller
-    {
+    public class DoutorController : Controller {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utente> _userManager;
         private readonly ILogger<DoutorController> _logger;
@@ -17,8 +15,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         public DoutorController(
             ApplicationDbContext context,
             UserManager<Utente> userManager,
-            ILogger<DoutorController> logger)
-        {
+            ILogger<DoutorController> logger) {
             _context = context;
             _userManager = userManager;
             _logger = logger;
@@ -28,8 +25,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Painel de controlo do médico
         /// </summary>
         [HttpGet]
-        public IActionResult Dashboard()
-        {
+        public IActionResult Dashboard() {
             return View();
         }
 
@@ -37,46 +33,37 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Apresenta o formulário para pesquisar um utilizador pelo NumeroUtente
         /// </summary>
         [HttpGet]
-        public IActionResult SearchUtente()
-        {
+        public IActionResult SearchUtente() {
             return View();
         }
 
         /// <summary>
         /// Processa a pesquisa de um utilizador pelo NumeroUtente
-        /// Redireciona para a página de detalhes do utilizador encontrado
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SearchUtente(string numeroUtente)
-        {
-            if (string.IsNullOrWhiteSpace(numeroUtente))
-            {
+        public async Task<IActionResult> SearchUtente(string numeroUtente) {
+            if (string.IsNullOrWhiteSpace(numeroUtente)) {
                 ModelState.AddModelError("numeroUtente", "Por favor, introduza um Número de Utente.");
                 return View();
             }
 
             var utente = await _userManager.FindByNameAsync(numeroUtente);
-            if (utente == null)
-            {
+            if (utente == null) {
                 ModelState.AddModelError("numeroUtente", "Utilizador não encontrado.");
                 return View();
             }
 
-            // Redireciona para a página de detalhes do utilizador
             return RedirectToAction("ViewUtenteData", new { utenteId = utente.Id });
         }
 
         /// <summary>
         /// Visualiza os dados e receitas de um utilizador específico
-        /// Apenas acessível a médicos
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> ViewUtenteData(string utenteId)
-        {
+        public async Task<IActionResult> ViewUtenteData(string utenteId) {
             var utente = await _userManager.FindByIdAsync(utenteId);
-            if (utente == null)
-            {
+            if (utente == null) {
                 return NotFound("Utilizador não encontrado.");
             }
 
@@ -98,22 +85,17 @@ namespace TrabalhoFinalDWEB2026.Controllers
 
         /// <summary>
         /// Apresenta o formulário para criar uma nova receita para um utilizador
-        /// Restrição: Um médico não pode criar receita para si próprio
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> CreateReceita(string utenteId)
-        {
+        public async Task<IActionResult> CreateReceita(string utenteId) {
             var currentDoctor = await _userManager.GetUserAsync(User);
             var targetUtente = await _userManager.FindByIdAsync(utenteId);
 
-            if (targetUtente == null)
-            {
+            if (targetUtente == null) {
                 return NotFound("Utilizador de destino não encontrado.");
             }
 
-            // Impede que o médico crie receita para si próprio
-            if (currentDoctor.Id == utenteId)
-            {
+            if (currentDoctor != null && currentDoctor.Id == utenteId) {
                 ModelState.AddModelError(string.Empty, "Não pode criar receita para si próprio.");
                 return RedirectToAction("SearchUtente");
             }
@@ -128,60 +110,48 @@ namespace TrabalhoFinalDWEB2026.Controllers
         }
 
         /// <summary>
-        /// Processa a criação de uma nova receita para um utilizador
-        /// Adiciona os medicamentos à receita através da relação M:N
+        /// Processa a criação de uma nova receita com o enum Receita.State.Emitida
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateReceita(string utenteId, CreateReceitaModel model)
-        {
+        public async Task<IActionResult> CreateReceita(string utenteId, CreateReceitaModel model) {
             var currentDoctor = await _userManager.GetUserAsync(User);
-            if (currentDoctor == null)
-            {
+            if (currentDoctor == null) {
                 return RedirectToAction("Login", "Account");
             }
 
             var targetUtente = await _userManager.FindByIdAsync(utenteId);
-            if (targetUtente == null)
-            {
+            if (targetUtente == null) {
                 return NotFound("Utilizador de destino não encontrado.");
             }
 
-            // Impede que o médico crie receita para si próprio
-            if (currentDoctor.Id == utenteId)
-            {
+            if (currentDoctor.Id == utenteId) {
                 return Forbid();
             }
 
-            if (ModelState.IsValid)
-            {
-                var receita = new Receita
-                {
+            if (ModelState.IsValid) {
+                var receita = new Receita {
                     UtenteId = utenteId,
                     DoutorId = currentDoctor.Id,
                     DataEmissao = DateTime.Now,
-                    Estado = "Emitida"
+                    Estado = Receita.State.Emitida // Atualizado para Enum
                 };
 
                 _context.Receitas.Add(receita);
                 await _context.SaveChangesAsync();
 
-                // Adiciona os medicamentos à receita
-                if (model.MedicamentoIds != null && model.MedicamentoIds.Any())
-                {
-                    for (int i = 0; i < model.MedicamentoIds.Count; i++)
-                    {
+                if (model.MedicamentoIds != null && model.MedicamentoIds.Any()) {
+                    for (int i = 0; i < model.MedicamentoIds.Count; i++) {
                         var medicamentoId = model.MedicamentoIds[i];
                         var quantidade = (i < model.Quantidades.Count) ? model.Quantidades[i] : 1;
 
                         var medicamento = await _context.Medicamentos.FindAsync(medicamentoId);
-                        if (medicamento != null)
-                        {
-                            var receitaMedicamento = new ReceitaMedicamentos
-                            {
+                        if (medicamento != null) {
+                            var receitaMedicamento = new ReceitaMedicamentos {
                                 ReceitaId = receita.Id,
                                 MedicamentoId = medicamentoId,
-                                Quantidade = quantidade
+                                Quantidade = quantidade,
+                                Posologia = "Conforme indicação clínica"
                             };
                             _context.ReceitaMedicamentos.Add(receitaMedicamento);
                         }
@@ -189,7 +159,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                _logger.LogInformation("Médico {DoutorId} criou receita {ReceitaId} para utilizador {UtenteId}", 
+                _logger.LogInformation("Médico {DoutorId} criou receita {ReceitaId} para utilizador {UtenteId}",
                     currentDoctor.Id, receita.Id, utenteId);
 
                 return RedirectToAction("ViewUtenteData", new { utenteId });
@@ -203,41 +173,35 @@ namespace TrabalhoFinalDWEB2026.Controllers
         }
 
         /// <summary>
-        /// Deleta uma receita
-        /// Apenas o doutor que criou a receita pode deletá-la
+        /// Elimina uma receita
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteReceita(int receitaId, string utenteId)
-        {
+        public async Task<IActionResult> DeleteReceita(int receitaId, string utenteId) {
             var currentDoctor = await _userManager.GetUserAsync(User);
-            if (currentDoctor == null)
-            {
+            if (currentDoctor == null) {
                 return RedirectToAction("Login", "Account");
             }
 
             var receita = await _context.Receitas.FindAsync(receitaId);
-            if (receita == null)
-            {
+            if (receita == null) {
                 return NotFound("Receita não encontrada.");
             }
 
-            // Verifica se o doutor é o criador da receita
-            if (receita.DoutorId != currentDoctor.Id)
-            {
-                return Forbid("Só pode deletar receitas que criou.");
+            if (receita.DoutorId != currentDoctor.Id) {
+                return Forbid();
             }
 
-            try
-            {
-                // Remove os medicamentos associados à receita
+            if (receita.Estado == Receita.State.Aviada) {
+                return BadRequest("Não é permitido eliminar receitas já aviadas.");
+            }
+
+            try {
                 var medicamentosReceita = await _context.ReceitaMedicamentos
                     .Where(rm => rm.ReceitaId == receitaId)
                     .ToListAsync();
 
                 _context.ReceitaMedicamentos.RemoveRange(medicamentosReceita);
-
-                // Remove a receita
                 _context.Receitas.Remove(receita);
                 await _context.SaveChangesAsync();
 
@@ -245,17 +209,14 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     currentDoctor.Id, receitaId, utenteId);
 
                 return RedirectToAction("ViewUtenteData", new { utenteId });
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 _logger.LogError(ex, "Erro ao deletar receita {ReceitaId}", receitaId);
                 return RedirectToAction("ViewUtenteData", new { utenteId });
             }
         }
     }
 
-    public class CreateReceitaModel
-    {
+    public class CreateReceitaModel {
         public List<int> MedicamentoIds { get; set; } = new List<int>();
         public List<int> Quantidades { get; set; } = new List<int>();
     }

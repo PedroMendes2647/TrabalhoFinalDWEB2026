@@ -34,24 +34,20 @@
                         <div class="col-md-6">
                             <strong>Estado:</strong>
                             <p>
-                                @if (Model.Estado == "Emitida")
-                                {
-                                    <span class="badge bg-warning">Pendente</span>
-                                }
-                                else if (Model.Estado == "Aviada")
-                                {
+                                @if (Model.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Emitida) {
+                                    <span class="badge bg-warning text-dark">Pendente</span>
+                                } else if (Model.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Aviada) {
                                     <span class="badge bg-success">Aviada</span>
-                                }
-                                else
-                                {
+                                } else if (Model.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Expirada) {
+                                    <span class="badge bg-danger">Expirada</span>
+                                } else {
                                     <span class="badge bg-secondary">@Model.Estado</span>
                                 }
                             </p>
                         </div>
                     </div>
 
-                    @if (Model.DataDispensacao.HasValue)
-                    {
+                    @if (Model.DataDispensacao.HasValue) {
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <strong>Data de Dispensação:</strong>
@@ -71,14 +67,11 @@
                         <div class="col-md-6">
                             <strong>Paciente/Utente:</strong>
                             <p>
-                                @if (Model.Utente != null)
-                                {
+                                @if (Model.Utente != null) {
                                     <a href="@Url.Action("ViewUtenteProfile", "Management", new { utenteId = Model.Utente.Id })">
                                         @Model.Utente.Nome (@Model.Utente.NumeroUtente)
                                     </a>
-                                }
-                                else
-                                {
+                                } else {
                                     <span class="text-muted">N/A</span>
                                 }
                             </p>
@@ -89,8 +82,7 @@
                         </div>
                     </div>
 
-                    @if (Model.FarmaceutaUtente != null)
-                    {
+                    @if (Model.FarmaceutaUtente != null) {
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <strong>Farmacêutico Responsável:</strong>
@@ -106,8 +98,7 @@
                     <h5 class="mb-0"><i class="bi bi-capsule"></i> Medicamentos Receitados</h5>
                 </div>
                 <div class="card-body">
-                    @if (Model.ListaDeMedicamentos != null && Model.ListaDeMedicamentos.Any())
-                    {
+                    @if (Model.ListaDeMedicamentos != null && Model.ListaDeMedicamentos.Any()) {
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead class="table-light">
@@ -119,8 +110,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var med in Model.ListaDeMedicamentos)
-                                    {
+                                    @foreach (var med in Model.ListaDeMedicamentos) {
                                         <tr>
                                             <td>@(med.Medicamento?.Nome ?? "N/A")</td>
                                             <td>@med.Quantidade</td>
@@ -131,9 +121,7 @@
                                 </tbody>
                             </table>
                         </div>
-                    }
-                    else
-                    {
+                    } else {
                         <div class="alert alert-info">
                             Nenhum medicamento registado para esta receita.
                         </div>
@@ -160,20 +148,16 @@
                     <hr>
                     <p class="mb-2">
                         <strong>Status da Dispensação:</strong><br>
-                        @if (Model.DataDispensacao.HasValue)
-                        {
+                        @if (Model.DataDispensacao.HasValue) {
                             <span class="badge bg-success">Dispensada</span>
-                        }
-                        else
-                        {
-                            <span class="badge bg-warning">Pendente</span>
+                        } else {
+                            <span class="badge bg-warning text-dark">Pendente</span>
                         }
                     </p>
                 </div>
             </div>
 
-            @if (userRoles.Contains("Farmaceuta") && Model.Estado == "Emitida")
-            {
+            @if (userRoles.Contains("Farmaceuta") && Model.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Emitida) {
                 <div class="card border-success">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0"><i class="bi bi-check-circle"></i> Ação</h5>

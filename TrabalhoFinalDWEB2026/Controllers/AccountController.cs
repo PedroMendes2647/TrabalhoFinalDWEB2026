@@ -99,7 +99,9 @@ namespace TrabalhoFinalDWEB2026.Controllers {
 
                 if (result.Succeeded) {
                     _logger.LogInformation("Utilizador autenticado com sucesso: {NumeroUtente}", model.NumeroUtente);
-                    return RedirectToAction("Dashboard", "Utente");
+
+                    // Alterado de ("Dashboard", "Utente") para ("Index", "Dashboard")
+                    return RedirectToAction("Index", "Dashboard");
                 }
 
                 if (result.IsLockedOut) {

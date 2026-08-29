@@ -5,11 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.Data;
 using TrabalhoFinalDWEB2026.Models;
 
-namespace TrabalhoFinalDWEB2026.Controllers
-{
+namespace TrabalhoFinalDWEB2026.Controllers {
     [Authorize]
-    public class ManagementController : Controller
-    {
+    public class ManagementController : Controller {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utente> _userManager;
         private readonly ILogger<ManagementController> _logger;
@@ -17,8 +15,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         public ManagementController(
             ApplicationDbContext context,
             UserManager<Utente> userManager,
-            ILogger<ManagementController> logger)
-        {
+            ILogger<ManagementController> logger) {
             _context = context;
             _userManager = userManager;
             _logger = logger;
@@ -27,27 +24,24 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// <summary>
         /// Ver receitas aviadas (dispensadas) - apenas para farmacêuticos
         /// </summary>
-        public async Task<IActionResult> ViewAviacoes()
-        {
+        public async Task<IActionResult> ViewAviacoes() {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            if (!userRoles.Contains("Farmaceuta"))
-            {
+            if (!userRoles.Contains("Farmaceuta")) {
                 return RedirectToAction("Index", "Dashboard");
             }
 
-            // Receitas aviadas (dispensadas)
             var receitas = await _context.Receitas
                 .Include(r => r.ListaDeMedicamentos)
                 .ThenInclude(rm => rm.Medicamento)
                 .Include(r => r.Utente)
                 .Include(r => r.DoutorUtente)
                 .Include(r => r.FarmaceutaUtente)
-                .Where(r => r.Estado == "Aviada")
+                .Where(r => r.Estado == Receita.State.Aviada) // Atualizado para Enum
                 .OrderByDescending(r => r.DataDispensacao)
                 .ToListAsync();
 
@@ -56,10 +50,9 @@ namespace TrabalhoFinalDWEB2026.Controllers
         }
 
         /// <summary>
-        /// Ver receitas pendentes de aviamento - apenas para farmacêuticos
+        /// Ver receitas pendentes de aviamento ou do próprio utilizador
         /// </summary>
-        public async Task<IActionResult> ViewReceitas(string numeroUtente = "")
-        {
+        public async Task<IActionResult> ViewReceitas(string numeroUtente = "") {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -67,9 +60,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
             var userRoles = await _userManager.GetRolesAsync(user);
             IEnumerable<Receita> receipts = new List<Receita>();
 
-            if (userRoles.Contains("Utente"))
-            {
-                // Receitas do utilizador
+            if (userRoles.Contains("Utente") && !userRoles.Contains("Doutor") && !userRoles.Contains("Farmaceuta")) {
                 receipts = await _context.Receitas
                     .Where(r => r.UtenteId == user.Id)
                     .Include(r => r.ListaDeMedicamentos)
@@ -79,10 +70,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     .Include(r => r.FarmaceutaUtente)
                     .OrderByDescending(r => r.DataEmissao)
                     .ToListAsync();
-            }
-            else if (userRoles.Contains("Doutor"))
-            {
-                // Receitas emitidas pelo médico
+            } else if (userRoles.Contains("Doutor")) {
                 receipts = await _context.Receitas
                     .Where(r => r.DoutorId == user.Id)
                     .Include(r => r.ListaDeMedicamentos)
@@ -92,31 +80,23 @@ namespace TrabalhoFinalDWEB2026.Controllers
                     .Include(r => r.FarmaceutaUtente)
                     .OrderByDescending(r => r.DataEmissao)
                     .ToListAsync();
-            }
-            else if (userRoles.Contains("Farmaceuta"))
-            {
-                // Receitas pendentes para aviamento
-                if (!string.IsNullOrWhiteSpace(numeroUtente))
-                {
+            } else if (userRoles.Contains("Farmaceuta")) {
+                if (!string.IsNullOrWhiteSpace(numeroUtente)) {
                     var query = _context.Receitas
                         .Include(r => r.ListaDeMedicamentos)
                         .ThenInclude(rm => rm.Medicamento)
                         .Include(r => r.Utente)
                         .Include(r => r.DoutorUtente)
                         .Include(r => r.FarmaceutaUtente)
-                        .Where(r => r.Estado == "Emitida")
-                        .Where(r => r.Utente.NumeroUtente.Contains(numeroUtente));
+                        .Where(r => r.Estado == Receita.State.Emitida) // Atualizado para Enum
+                        .Where(r => r.Utente != null && r.Utente.NumeroUtente.Contains(numeroUtente));
 
                     receipts = await query
                         .OrderByDescending(r => r.DataEmissao)
                         .ToListAsync();
 
-                    // Passar o número de utente pesquisado para a view
                     ViewBag.NumeroUtentePesquisado = numeroUtente;
-                }
-                else
-                {
-                    // Se não houver pesquisa, retorna lista vazia
+                } else {
                     receipts = new List<Receita>();
                     ViewBag.NumeroUtentePesquisado = "";
                 }
@@ -129,13 +109,12 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// <summary>
         /// Ver todos os medicamentos disponíveis
         /// </summary>
-        public async Task<IActionResult> ViewMedicamentos()
-        {
+        public async Task<IActionResult> ViewMedicamentos() {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
 
-            var medications = _context.Medicamentos.ToList();
+            var medications = await _context.Medicamentos.ToListAsync();
 
             _logger.LogInformation("Utilizador {NumeroUtente} viu a lista de medicamentos", user.NumeroUtente);
             return View(medications);
@@ -145,13 +124,12 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Ver lista de utentes (apenas para médicos e farmacêuticos)
         /// </summary>
         [Authorize(Roles = "Doutor,Farmaceuta")]
-        public async Task<IActionResult> ViewUtentes()
-        {
+        public async Task<IActionResult> ViewUtentes() {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
 
-            var utentes = _context.Utentes.ToList();
+            var utentes = await _context.Utentes.ToListAsync();
 
             _logger.LogInformation("Utilizador {NumeroUtente} viu a lista de utentes", user.NumeroUtente);
             return View(utentes);
@@ -161,8 +139,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Editar perfil do utilizador
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> EditPerfil()
-        {
+        public async Task<IActionResult> EditPerfil() {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -175,8 +152,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditPerfil(Utente model)
-        {
+        public async Task<IActionResult> EditPerfil(Utente model) {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -189,8 +165,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
             user.DataNascimento = model.DataNascimento;
 
             var result = await _userManager.UpdateAsync(user);
-            if (result.Succeeded)
-            {
+            if (result.Succeeded) {
                 _logger.LogInformation("Utilizador {NumeroUtente} atualizou o perfil", user.NumeroUtente);
                 return RedirectToAction("Index", "Dashboard");
             }
@@ -202,8 +177,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Página para alterar palavra-passe
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> ChangePassword()
-        {
+        public async Task<IActionResult> ChangePassword() {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -216,8 +190,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
-        {
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model) {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
                 return RedirectToAction("Login", "Account");
@@ -226,8 +199,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
                 return View(model);
 
             var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-            if (result.Succeeded)
-            {
+            if (result.Succeeded) {
                 _logger.LogInformation("Utilizador {NumeroUtente} alterou a palavra-passe", user.NumeroUtente);
                 return RedirectToAction("Index", "Dashboard");
             }
@@ -242,8 +214,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Visualiza o perfil de um utente específico
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> ViewUtenteProfile(string utenteId)
-        {
+        public async Task<IActionResult> ViewUtenteProfile(string utenteId) {
             if (string.IsNullOrEmpty(utenteId))
                 return NotFound("Utente não encontrado.");
 
@@ -259,8 +230,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// Visualiza os detalhes de uma receita específica
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> ReceitaDetails(int receitaId)
-        {
+        public async Task<IActionResult> ReceitaDetails(int receitaId) {
             var receita = await _context.Receitas
                 .Include(r => r.Utente)
                 .Include(r => r.DoutorUtente)
@@ -281,29 +251,29 @@ namespace TrabalhoFinalDWEB2026.Controllers
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DispenseReceita(int id)
-        {
+        public async Task<IActionResult> DispenseReceita(int id) {
             var receita = await _context.Receitas.FindAsync(id);
 
             if (receita == null)
                 return NotFound("Receita não encontrada.");
 
-            if (receita.Estado != "Emitida")
+            if (receita.Estado != Receita.State.Emitida) // Atualizado para Enum
             {
                 ModelState.AddModelError(string.Empty, $"Não consegue dispensar receita com o estado '{receita.Estado}'. Só receitas em estado 'Emitida' podem ser dispensadas.");
                 return RedirectToAction("ReceitaDetails", new { receitaId = id });
             }
 
             var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null) return RedirectToAction("Login", "Account");
+
             var userRoles = await _userManager.GetRolesAsync(currentUser);
 
-            if (!userRoles.Contains("Farmaceuta"))
-            {
+            if (!userRoles.Contains("Farmaceuta")) {
                 _logger.LogWarning("Utilizador com Id {UserId} não tem permissão Farmaceuta.", currentUser.Id);
                 return Forbid();
             }
 
-            receita.Estado = "Aviada";
+            receita.Estado = Receita.State.Aviada; // Atualizado para Enum
             receita.FarmaceutaId = currentUser.Id;
             receita.DataDispensacao = DateTime.Now;
 
@@ -316,8 +286,7 @@ namespace TrabalhoFinalDWEB2026.Controllers
         }
     }
 
-    public class ChangePasswordModel
-    {
+    public class ChangePasswordModel {
         public string CurrentPassword { get; set; } = string.Empty;
         public string NewPassword { get; set; } = string.Empty;
         public string ConfirmPassword { get; set; } = string.Empty;

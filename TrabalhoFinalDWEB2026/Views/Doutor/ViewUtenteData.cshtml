@@ -15,8 +15,7 @@
         </div>
     </div>
 
-    @if (utente != null)
-    {
+    @if (utente != null) {
         <div class="row mb-4">
             <div class="col-md-8">
                 <div class="card border-success">
@@ -57,7 +56,7 @@
                         <h5 class="mb-0">Ações</h5>
                     </div>
                     <div class="card-body d-grid gap-2">
-                        <a href="@Url.Action("CreateReceita", "Doutor", new { utenteId = utente.Id })" 
+                        <a href="@Url.Action("CreateReceita", "Doutor", new { utenteId = utente.Id })"
                            class="btn btn-success">
                             <i class="bi bi-plus-circle"></i> Criar Receita
                         </a>
@@ -75,8 +74,7 @@
                         </h5>
                     </div>
                     <div class="card-body">
-                        @if (receitas != null && receitas.Count > 0)
-                        {
+                        @if (receitas != null && receitas.Count > 0) {
                             <div class="table-responsive">
                                 <table class="table table-hover">
                                     <thead class="table-light">
@@ -90,55 +88,40 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var receita in receitas)
-                                        {
+                                        @foreach (var receita in receitas) {
                                             <tr>
                                                 <td>#@receita.Id</td>
                                                 <td>@receita.DataEmissao.ToString("dd/MM/yyyy HH:mm")</td>
                                                 <td>
-                                                    @if (receita.Estado == "Emitida")
-                                                    {
+                                                    @if (receita.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Emitida) {
                                                         <span class="badge bg-warning text-dark">Emitida</span>
-                                                    }
-                                                    else if (receita.Estado == "Aviada")
-                                                    {
+                                                    } else if (receita.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Aviada) {
                                                         <span class="badge bg-success">Aviada</span>
-                                                    }
-                                                    else if (receita.Estado == "Expirada")
-                                                    {
+                                                    } else if (receita.Estado == TrabalhoFinalDWEB2026.Models.Receita.State.Expirada) {
                                                         <span class="badge bg-danger">Expirada</span>
-                                                    }
-                                                    else
-                                                    {
+                                                    } else {
                                                         <span class="badge bg-secondary">@receita.Estado</span>
                                                     }
                                                 </td>
                                                 <td>
-                                                    @if (receita.DataDispensacao.HasValue)
-                                                    {
+                                                    @if (receita.DataDispensacao.HasValue) {
                                                         <text>@receita.DataDispensacao.Value.ToString("dd/MM/yyyy HH:mm")</text>
-                                                    }
-                                                    else
-                                                    {
+                                                    } else {
                                                         <text>-</text>
                                                     }
                                                 </td>
                                                 <td>
-                                                    @if (receita.ListaDeMedicamentos != null && receita.ListaDeMedicamentos.Count > 0)
-                                                    {
+                                                    @if (receita.ListaDeMedicamentos != null && receita.ListaDeMedicamentos.Count > 0) {
                                                         <small>@receita.ListaDeMedicamentos.Count medicamento(s)</small>
-                                                    }
-                                                    else
-                                                    {
+                                                    } else {
                                                         <small class="text-muted">Nenhum</small>
                                                     }
                                                 </td>
                                                 <td>
-                                                    <a href="#" class="btn btn-sm btn-info" title="Ver Detalhes">
+                                                    <a href="@Url.Action("ReceitaDetails", "Management", new { receitaId = receita.Id })" class="btn btn-sm btn-info" title="Ver Detalhes">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
-                                                    @if (receita.Estado != "Aviada")
-                                                    {
+                                                    @if (receita.Estado != TrabalhoFinalDWEB2026.Models.Receita.State.Aviada) {
                                                         <form method="post" action="@Url.Action("DeleteReceita", "Doutor")" style="display:inline;">
                                                             @Html.AntiForgeryToken()
                                                             <input type="hidden" name="receitaId" value="@receita.Id" />
@@ -147,9 +130,7 @@
                                                                 <i class="bi bi-trash"></i> Apagar
                                                             </button>
                                                         </form>
-                                                    }
-                                                    else
-                                                    {
+                                                    } else {
                                                         <button type="button" class="btn btn-sm btn-secondary" disabled title="Não pode apagar receitas aviadas">
                                                             <i class="bi bi-trash"></i> Apagar
                                                         </button>
@@ -160,9 +141,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                        }
-                        else
-                        {
+                        } else {
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle"></i> Este paciente não possui receitas registadas.
                             </div>
@@ -171,9 +150,7 @@
                 </div>
             </div>
         </div>
-    }
-    else
-    {
+    } else {
         <div class="alert alert-danger">
             <i class="bi bi-exclamation-circle"></i> Dados do paciente não estão disponíveis.
         </div>
