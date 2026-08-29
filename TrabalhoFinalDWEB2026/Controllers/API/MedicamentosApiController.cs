@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.Data;
 using TrabalhoFinalDWEB2026.Models;
 
 namespace TrabalhoFinalDWEB2026.Controllers.Api {
+    [Authorize] // Exige autenticação válida para qualquer operação com medicamentos
     [ApiController]
     [Route("api/[controller]")]
     public class MedicamentosApiController : ControllerBase {
@@ -13,10 +15,8 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             _context = context;
         }
 
-
-
         /// <summary>
-        ///  Obtém uma lista de medicamentos 
+        /// Obtém uma lista de medicamentos (Permitido a qualquer utilizador autenticado)
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Medicamentos>>> GetMedicamentos() {
@@ -34,8 +34,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         }
 
         /// <summary>
-        /// Cria um novo medicamento
+        /// Cria um novo medicamento (Apenas Doutores e Farmacêuticos autorizados)
         /// </summary>
+        [Authorize(Roles = "Doutor,Farmaceuta")]
         [HttpPost]
         public async Task<ActionResult<Medicamentos>> PostMedicamento(Medicamentos medicamento) {
             if (!ModelState.IsValid) {
@@ -51,6 +52,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         /// <summary>
         /// Atualiza os dados de um medicamento existente
         /// </summary>
+        [Authorize(Roles = "Doutor,Farmaceuta")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMedicamento(int id, Medicamentos medicamento) {
             if (id != medicamento.Id) {
@@ -77,8 +79,8 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
 
         /// <summary>
         /// Elimina um medicamento. Não permite eliminar medicamentos associados a receitas ativas.
-        /// Regra de Negócio: Protección de referencial integrity
         /// </summary>
+        [Authorize(Roles = "Doutor,Farmaceuta")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMedicamento(int id) {
             var medicamento = await _context.Medicamentos.FindAsync(id);

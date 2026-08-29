@@ -25,9 +25,8 @@ namespace TrabalhoFinalDWEB2026.Models {
         /// Estado atual da receita (ex: "Emitida", "Aviada", "Expirada")
         /// </summary>
         [Required]
-        [StringLength(20)]
         [DisplayName("Estado da Receita")]
-        public string Estado { get; set; } = "Emitida";
+        public State Estado { get; set; }
 
         /// <summary>
         /// Data e hora em que a receita foi aviada pelo farmacêutico
@@ -77,5 +76,10 @@ namespace TrabalhoFinalDWEB2026.Models {
         public ICollection<ReceitaMedicamentos> ListaDeMedicamentos { get; set; } = [];
 
         /* **************************************************** */
+        public enum State {
+            Emitida,
+            Aviada,
+            Expirada
+        }   
     }
 }
