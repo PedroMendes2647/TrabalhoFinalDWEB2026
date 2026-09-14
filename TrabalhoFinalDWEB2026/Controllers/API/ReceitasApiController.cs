@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.Data;
 using TrabalhoFinalDWEB2026.Models;
 
 namespace TrabalhoFinalDWEB2026.Controllers.Api {
+    [Authorize] // Exige autenticação para qualquer operação com receitas
     [ApiController]
     [Route("api/[controller]")]
     public class ReceitasApiController : ControllerBase {
@@ -43,8 +45,9 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         }
 
         /// <summary>
-        /// Cria uma nova receita com medicamentos associados
+        /// Cria uma nova receita com medicamentos associados. Apenas utilizadores com Role "Doutor" podem emitir receitas.
         /// </summary>
+        [Authorize(Roles = "Doutor")]
         [HttpPost]
         public async Task<ActionResult<Receita>> PostReceita(ReceitaInputDto input) {
             if (!ModelState.IsValid) {
@@ -55,7 +58,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
                 UtenteId = input.UtenteId,
                 DoutorId = input.DoutorId,
                 DataEmissao = DateTime.Now,
-                Estado = "Emitida"
+                Estado = Receita.State.Emitida
             };
 
             _context.Receitas.Add(receita);
@@ -79,9 +82,10 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         }
 
         /// <summary>
-        /// Atualiza os dados de uma receita e seus medicamentos associados.
+        /// Atualiza os dados de uma receita e seus medicamentos associados. Apenas Doutores podem alterar prescrições.
         /// Restrição: Não permite editar receitas já aviadas pelo farmacêutico.
         /// </summary>
+        [Authorize(Roles = "Doutor")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReceita(int id, ReceitaInputDto input) {
             var receita = await _context.Receitas
@@ -93,7 +97,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             }
 
             // Regra de Negócio: Não permitir editar receitas já aviadas pelo farmacêutico
-            if (receita.Estado == "Aviada") {
+            if (receita.Estado == Receita.State.Aviada) {
                 return BadRequest(new { mensagem = "Não é permitido alterar dados de uma receita já aviada." });
             }
 
@@ -126,9 +130,10 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
         }
 
         /// <summary>
-        /// Elimina uma receita.
+        /// Elimina uma receita. Apenas Doutores podem eliminar receitas.
         /// Restrição: Não permite eliminar receitas já entregues/aviadas pelo farmacêutico.
         /// </summary>
+        [Authorize(Roles = "Doutor")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReceita(int id) {
             var receita = await _context.Receitas.FindAsync(id);
@@ -137,7 +142,7 @@ namespace TrabalhoFinalDWEB2026.Controllers.Api {
             }
 
             // Regra de Negócio: Impedir eliminação de receitas já entregues/aviadas
-            if (receita.Estado == "Aviada") {
+            if (receita.Estado == Receita.State.Aviada) {
                 return BadRequest(new { mensagem = "Não é permitido eliminar receitas que já tenham sido aviadas." });
             }
 

@@ -9,9 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ===== CONFIGURAÇÃO DE SERVIÇOS =====
 
-/// <summary>
-/// Adiciona suporte para controladores MVC com vistas e força AUTENTICAÇÃO GLOBAL
-/// </summary>
+// Controladores MVC com filtro global de autorização
 builder.Services.AddControllersWithViews(options => {
     var policy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
@@ -19,18 +17,31 @@ builder.Services.AddControllersWithViews(options => {
     options.Filters.Add(new AuthorizeFilter(policy));
 });
 
-/// <summary>
-/// Configura o contexto de base de dados com SQL Server
-/// </summary>
+// Configuração da Base de Dados
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? "Server=(localdb)\\mssqllocaldb;Database=TrabalhoFinalDWEB2026;Trusted_Connection=True;MultipleActiveResultSets=true"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? "Server=(localdb)\\mssqllocaldb;Database=TrabalhoFinalDWEB2026;Trusted_Connection=True;MultipleActiveResultSets=true"));
 
-/// <summary>
-/// Configura o sistema de Autenticação e Autorização ASP.NET Core Identity
-/// </summary>
-builder.Services.AddDefaultIdentity<Utente>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddRoles<IdentityRole<string>>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+// Configuração nativa do ASP.NET Core Identity
+builder.Services.AddIdentity<Utente, IdentityRole<string>>(options => {
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Lockout.MaxFailedAccessAttempts = 5;
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+// Configuração de Cookies de Autenticação do Identity
+builder.Services.ConfigureApplicationCookie(options => {
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromHours(2);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 
@@ -40,10 +51,9 @@ using (var scope = app.Services.CreateScope()) {
     var services = scope.ServiceProvider;
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole<string>>>();
     var userManager = services.GetRequiredService<UserManager<Utente>>();
-    // Injeta o contexto da base de dados para podermos criar os medicamentos
     var context = services.GetRequiredService<ApplicationDbContext>();
 
-    // ===== 1. CRIAR ROLES =====
+    // 1. Criar Roles
     string[] roles = { "Utente", "Doutor", "Farmaceuta" };
     foreach (var role in roles) {
         if (!await roleManager.RoleExistsAsync(role)) {
@@ -51,52 +61,64 @@ using (var scope = app.Services.CreateScope()) {
         }
     }
 
-    // ===== 2. CRIAR UTILIZADORES DE TESTE PADRÃO =====
-    var defaultUsers = new[]
-    {
-        new { NumeroUtente = "000000001", Nome = "Utilizador Teste", Role = "Utente", Password = "Senha@123" },
-        new { NumeroUtente = "000000002", Nome = "Médico Teste", Role = "Doutor", Password = "Senha@123" },
-        new { NumeroUtente = "000000003", Nome = "Farmacêutico Teste", Role = "Farmaceuta", Password = "Senha@123" }
-    };
+    // 2. Criar Utilizadores Padrão (Doutores e Farmaceutas usam as respetivas subclasses)
+    if (await userManager.FindByNameAsync("000000001") == null) {
+        var utente = new Utente {
+            Id = "000000001",
+            UserName = "000000001",
+            NumeroUtente = "000000001",
+            Nome = "Utilizador Teste",
+            Email = "000000001@exemplo.com",
+            DataNascimento = new DateTime(1990, 1, 1),
+            EmailConfirmed = true
+        };
+        var res = await userManager.CreateAsync(utente, "Senha@123");
+        if (res.Succeeded) await userManager.AddToRoleAsync(utente, "Utente");
+    }
 
-    foreach (var userData in defaultUsers) {
-        var existingUser = await userManager.FindByNameAsync(userData.NumeroUtente);
-        if (existingUser == null) {
-            var newUser = new Utente {
-                Id = userData.NumeroUtente,
-                UserName = userData.NumeroUtente,
-                NumeroUtente = userData.NumeroUtente,
-                Nome = userData.Nome,
-                Email = $"{userData.NumeroUtente}@exemplo.com",
-                DataNascimento = new DateTime(1990, 1, 1),
-                EmailConfirmed = true
-            };
-
-            var result = await userManager.CreateAsync(newUser, userData.Password);
-
-            if (result.Succeeded) {
-                await userManager.AddToRoleAsync(newUser, userData.Role);
-            }
+    if (await userManager.FindByNameAsync("000000002") == null) {
+        var doutor = new Doutor {
+            Id = "000000002",
+            UserName = "000000002",
+            NumeroUtente = "000000002",
+            Nome = "Médico Teste",
+            Email = "000000002@exemplo.com",
+            DataNascimento = new DateTime(1985, 5, 15),
+            EmailConfirmed = true
+        };
+        var res = await userManager.CreateAsync(doutor, "Senha@123");
+        if (res.Succeeded) {
+            await userManager.AddToRoleAsync(doutor, "Utente");
+            await userManager.AddToRoleAsync(doutor, "Doutor");
         }
     }
 
-    // ===== 3. CRIAR MEDICAMENTOS DE TESTE PADRÃO =====
-    // Verifica se a tabela de medicamentos está totalmente vazia antes de inserir
+    if (await userManager.FindByNameAsync("000000003") == null) {
+        var farmaceuta = new Farmaceuta {
+            Id = "000000003",
+            UserName = "000000003",
+            NumeroUtente = "000000003",
+            Nome = "Farmacêutico Teste",
+            Email = "000000003@exemplo.com",
+            DataNascimento = new DateTime(1988, 10, 20),
+            EmailConfirmed = true
+        };
+        var res = await userManager.CreateAsync(farmaceuta, "Senha@123");
+        if (res.Succeeded) {
+            await userManager.AddToRoleAsync(farmaceuta, "Utente");
+            await userManager.AddToRoleAsync(farmaceuta, "Farmaceuta");
+        }
+    }
+
+    // 3. Criar Medicamentos Iniciais
     if (!context.Medicamentos.Any()) {
         var medicamentos = new[]
         {
-            new Medicamentos { Nome = "Paracetamol", Tipo = "Analgésico", Dosagem = "500mg" },
-            new Medicamentos { Nome = "Ibuprofeno", Tipo = "Anti-inflamatório", Dosagem = "400mg" },
-            new Medicamentos { Nome = "Amoxicilina", Tipo = "Antibiótico", Dosagem = "500mg" },
-            new Medicamentos { Nome = "Dipirona", Tipo = "Analgésico", Dosagem = "500mg" },
-            new Medicamentos { Nome = "Cetoconazol", Tipo = "Antifúngico", Dosagem = "200mg" },
-            new Medicamentos { Nome = "Omeprazol", Tipo = "Antiácido", Dosagem = "20mg" },
-            new Medicamentos { Nome = "Atorvastatina", Tipo = "Estatina", Dosagem = "10mg" },
-            new Medicamentos { Nome = "Metformina", Tipo = "Antidiabético", Dosagem = "500mg" },
-            new Medicamentos { Nome = "Losartano", Tipo = "Anti-hipertensivo", Dosagem = "50mg" },
-            new Medicamentos { Nome = "Captopril", Tipo = "Anti-hipertensivo", Dosagem = "25mg" },
-            new Medicamentos { Nome = "Sinvastatina", Tipo = "Estatina", Dosagem = "20mg" },
-            new Medicamentos { Nome = "Ranitidina", Tipo = "Antiácido H2", Dosagem = "150mg" }
+            new Medicamentos { Nome = "Paracetamol", Tipo = "Comprimido", Dosagem = "500mg" },
+            new Medicamentos { Nome = "Ibuprofeno", Tipo = "Comprimido", Dosagem = "400mg" },
+            new Medicamentos { Nome = "Amoxicilina", Tipo = "Cápsula", Dosagem = "500mg" },
+            new Medicamentos { Nome = "Dipirona", Tipo = "Gotas", Dosagem = "500mg/ml" },
+            new Medicamentos { Nome = "Omeprazol", Tipo = "Cápsula", Dosagem = "20mg" }
         };
 
         foreach (var med in medicamentos) {
@@ -107,7 +129,7 @@ using (var scope = app.Services.CreateScope()) {
     }
 }
 
-// ===== CONFIGURAÇÃO DO PIPELINE HTTP =====
+// ===== PIPELINE HTTP =====
 
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Home/Error");
@@ -115,22 +137,16 @@ if (!app.Environment.IsDevelopment()) {
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapStaticAssets();
 
-/// <summary>
-/// Define a rota por defeito para MVC redirecionando para o LOGIN DO ACCOUNT CONTROLLER
-/// </summary>
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
-app.MapRazorPages();
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

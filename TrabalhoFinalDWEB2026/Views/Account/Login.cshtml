@@ -37,7 +37,11 @@
                                 <input asp-for="Password" type="password" class="form-control" placeholder="Introduza a sua senha" required />
                                 <span asp-validation-for="Password" class="text-danger fs-6 d-block mt-1"></span>
                             </div>
-
+                            <!-- Campo: Lembrar Password -->
+                            <div class="mb-3 form-check">
+                                <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                                <label asp-for="RememberMe" class="form-check-label">Lembrar-me neste dispositivo</label>
+                            </div>
                             <!-- Botão Submeter -->
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary fw-bold">
