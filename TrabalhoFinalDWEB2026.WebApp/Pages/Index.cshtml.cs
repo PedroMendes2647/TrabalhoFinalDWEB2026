@@ -1,10 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TrabalhoFinalDWEB2026.WebApp.Pages {
     public class IndexModel : PageModel {
-        public void OnGet() {
+        private readonly ILogger<IndexModel> _logger;
 
+        public IndexModel(ILogger<IndexModel> logger) {
+            _logger = logger;
+        }
+
+        public void OnGet() {
+            // Página inicial
         }
     }
 }

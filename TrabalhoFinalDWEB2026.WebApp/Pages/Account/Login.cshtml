@@ -1,0 +1,58 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Iniciar Sessão";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Iniciar Sessão</h2>
+
+                    @if (Model.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="NumeroUtente" class="form-label">Número de Utente</label>
+                            <input class="form-control @(ModelState.IsValid ? "" : "is-invalid")" type="text" asp-for="Input.NumeroUtente" autocomplete="username" placeholder="Insira o seu número de utente" />
+                            <span asp-validation-for="Input.NumeroUtente" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Password" class="form-label">Palavra-passe</label>
+                            <input class="form-control @(ModelState.IsValid ? "" : "is-invalid")" type="password" asp-for="Input.Password" autocomplete="current-password" placeholder="Insira a sua palavra-passe" />
+                            <span asp-validation-for="Input.Password" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="Input.RememberMe" />
+                            <label class="form-check-label" asp-for="Input.RememberMe">
+                                Lembrar-me
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Iniciar Sessão</button>
+                    </form>
+
+                    <hr class="my-4" />
+
+                    <p class="text-center">
+                        Não tem conta? <a asp-page="./Register">Registar-se aqui</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
