@@ -1,0 +1,93 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.MyAccount.MyReceitasModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Minhas Receitas";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="bi bi-file-earmark-text"></i> Minhas Receitas
+            </h1>
+
+            @if (Model.Receitas != null && Model.Receitas.Count > 0)
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Tem <strong>@Model.Receitas.Count</strong> receita(s) registada(s).
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Receita</th>
+                                <th>Doutor</th>
+                                <th>Data de Emissão</th>
+                                <th>Estado</th>
+                                <th>Nº Medicamentos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var receita in Model.Receitas)
+                            {
+                                <tr>
+                                    <td><strong>#@receita.Id</strong></td>
+                                    <td>@receita.DoutorUtente?.Nome</td>
+                                    <td>@receita.DataEmissao.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (receita.Estado == Receita.State.Emitida)
+                                        {
+                                            <span class="badge bg-warning text-dark">Emitida</span>
+                                        }
+                                        else if (receita.Estado == Receita.State.Aviada)
+                                        {
+                                            <span class="badge bg-success">Aviada</span>
+                                        }
+                                        else if (receita.Estado == Receita.State.Expirada)
+                                        {
+                                            <span class="badge bg-secondary">Expirada</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@receita.Estado</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @(receita.ListaDeMedicamentos?.Count ?? 0)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-page="ReceitaDetails" asp-route-id="@receita.Id" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center py-5">
+                    <h4><i class="bi bi-inbox"></i> Sem Receitas</h4>
+                    <p>Ainda não tem receitas registadas no sistema.</p>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a asp-page="MyData" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Meus Dados
+                </a>
+                <a asp-page="/Dashboard/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> Painel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
