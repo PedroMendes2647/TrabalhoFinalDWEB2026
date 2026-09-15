@@ -1,0 +1,46 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Doutor.SearchUtenteModel
+@{
+    ViewData["Title"] = "Pesquisar Utente";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Pesquisar Utente</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Introduza o número de utente para visualizar os seus dados e criar receitas.</p>
+
+                    @if (!ModelState.IsValid && ModelState.ErrorCount > 0)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @foreach (var error in ModelState.Values.SelectMany(x => x.Errors))
+                            {
+                                <p>@error.ErrorMessage</p>
+                            }
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="numeroUtente" class="form-label">Número de Utente</label>
+                            <input type="text" class="form-control" id="numeroUtente" name="numeroUtente" placeholder="Ex: 123456789" required />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Pesquisar</button>
+                    </form>
+
+                    <hr class="my-4" />
+
+                    <p class="text-muted small">
+                        <i class="bi bi-info-circle"></i> O número de utente deve ter exatamente 9 dígitos.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

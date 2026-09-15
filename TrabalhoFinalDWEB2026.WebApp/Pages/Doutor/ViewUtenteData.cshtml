@@ -1,0 +1,161 @@
+@page "{utenteId}"
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Doutor.ViewUtenteDateModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Dados do Utente";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            @if (Model.Utente != null)
+            {
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0">Informações do Utente</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Número de Utente:</strong> @Model.Utente.NumeroUtente</p>
+                                <p><strong>Nome:</strong> @Model.Utente.Nome</p>
+                                <p><strong>E-mail:</strong> @Model.Utente.Email</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Data de Nascimento:</strong> @Model.Utente.DataNascimento.ToString("dd/MM/yyyy")</p>
+                                <p>
+                                    <a asp-page="CreateReceita" asp-route-utenteId="@Model.Utente.Id" class="btn btn-success btn-sm">
+                                        <i class="bi bi-plus-circle"></i> Criar Nova Receita
+                                    </a>
+                                    <a asp-page="SearchUtente" class="btn btn-secondary btn-sm">Voltar</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h4 class="mb-0">Receitas do Utente (@Model.Receitas?.Count ?? 0)</h4>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Receitas != null && Model.Receitas.Count > 0)
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Data de Emissão</th>
+                                            <th>Estado</th>
+                                            <th>Doutor</th>
+                                            <th>Farmacêutico</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var receita in Model.Receitas)
+                                        {
+                                            <tr>
+                                                <td>@receita.Id</td>
+                                                <td>@receita.DataEmissao.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>
+                                                    @switch (receita.Estado)
+                                                    {
+                                                        case Receita.State.Emitida:
+                                                            <span class="badge bg-primary">Emitida</span>
+                                                            break;
+                                                        case Receita.State.Aviada:
+                                                            <span class="badge bg-success">Aviada</span>
+                                                            break;
+                                                        case Receita.State.Expirada:
+                                                            <span class="badge bg-warning text-dark">Expirada</span>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td>@receita.DoutorUtente?.Nome</td>
+                                                <td>@receita.FarmaceutaUtente?.Nome</td>
+                                                <td>
+                                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#receitaModal@(receita.Id)">
+                                                        Ver Detalhes
+                                                    </button>
+                                                    @if (receita.Estado == Receita.State.Emitida)
+                                                    {
+                                                        <form method="post" style="display: inline;">
+                                                            <input type="hidden" name="receitaId" value="@receita.Id" />
+                                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem a certeza que deseja eliminar esta receita?');">
+                                                                Eliminar
+                                                            </button>
+                                                        </form>
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                            <!-- Modal para detalhes da receita -->
+                                            <div class="modal fade" id="receitaModal@(receita.Id)" tabindex="-1" aria-labelledby="receitaLabel@(receita.Id)" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="receitaLabel@(receita.Id)">Detalhes da Receita #@receita.Id</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <h6 class="fw-bold">Medicamentos</h6>
+                                                            @if (receita.ListaDeMedicamentos != null && receita.ListaDeMedicamentos.Count > 0)
+                                                            {
+                                                                <table class="table table-sm">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th>Medicamento</th>
+                                                                            <th>Quantidade</th>
+                                                                            <th>Posologia</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach (var rm in receita.ListaDeMedicamentos)
+                                                                        {
+                                                                            <tr>
+                                                                                <td>@rm.Medicamento?.Nome</td>
+                                                                                <td>@rm.Quantidade</td>
+                                                                                <td>@rm.Posologia</td>
+                                                                            </tr>
+                                                                        }
+                                                                    </tbody>
+                                                                </table>
+                                                            }
+                                                            else
+                                                            {
+                                                                <p class="text-muted">Sem medicamentos associados.</p>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Este utente não tem receitas registadas.</p>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <p>Utilizador não encontrado.</p>
+                    <a asp-page="SearchUtente" class="btn btn-secondary">Voltar</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5;
+    }
+</style>

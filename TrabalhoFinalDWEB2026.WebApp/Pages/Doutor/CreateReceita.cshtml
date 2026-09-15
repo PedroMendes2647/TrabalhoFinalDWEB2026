@@ -1,0 +1,121 @@
+@page "{utenteId}"
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Doutor.CreateReceitaModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Criar Receita";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Criar Nova Receita</h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.TargetUtente != null)
+                    {
+                        <h5>Utente: <strong>@Model.TargetUtente.Nome</strong></h5>
+                        <p class="text-muted">Número de Utente: @Model.TargetUtente.NumeroUtente</p>
+
+                        <form method="post">
+                            <input type="hidden" name="utenteId" value="@Model.TargetUtente.Id" />
+
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-3">Selecione Medicamentos</h6>
+
+                                @if (Model.Medicamentos != null && Model.Medicamentos.Count > 0)
+                                {
+                                    <div id="medicamentosContainer">
+                                        <div class="medicamento-item mb-3 p-3 border rounded">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label for="medicamento_0" class="form-label">Medicamento</label>
+                                                    <select class="form-select" name="MedicamentoIds" required>
+                                                        <option value="">-- Selecione um medicamento --</option>
+                                                        @foreach (var med in Model.Medicamentos)
+                                                        {
+                                                            <option value="@med.Id">@med.Nome (@med.Dosagem)</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <label for="quantidade_0" class="form-label">Quantidade</label>
+                                                    <input type="number" class="form-control" name="Quantidades" value="1" min="1" max="100" required />
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">&nbsp;</label>
+                                                    <button type="button" class="btn btn-danger w-100" onclick="removeMedicamento(this)">Remover</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="button" class="btn btn-outline-primary mb-3" onclick="adicionarMedicamento()">
+                                        <i class="bi bi-plus-circle"></i> Adicionar Medicamento
+                                    </button>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning">
+                                        Nenhum medicamento disponível.
+                                    </div>
+                                }
+                            </div>
+
+                            <hr class="my-4" />
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success">Criar Receita</button>
+                                <a asp-page="ViewUtenteData" asp-route-utenteId="@Model.TargetUtente.Id" class="btn btn-secondary">Cancelar</a>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <p>Utilizador de destino não encontrado.</p>
+                            <a asp-page="SearchUtente" class="btn btn-secondary">Voltar</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let medicamentoCount = 1;
+
+    function adicionarMedicamento() {
+        const container = document.getElementById('medicamentosContainer');
+        const medicamentos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Medicamentos.Select(m => new { m.Id, m.Nome, m.Dosagem })));
+
+        const novoItem = document.createElement('div');
+        novoItem.className = 'medicamento-item mb-3 p-3 border rounded';
+        novoItem.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Medicamento</label>
+                    <select class="form-select" name="MedicamentoIds" required>
+                        <option value="">-- Selecione um medicamento --</option>
+                        ${medicamentos.map(m => `<option value="${m.id}">${m.nome} (${m.dosagem})</option>`).join('')}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Quantidade</label>
+                    <input type="number" class="form-control" name="Quantidades" value="1" min="1" max="100" required />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">&nbsp;</label>
+                    <button type="button" class="btn btn-danger w-100" onclick="removeMedicamento(this)">Remover</button>
+                </div>
+            </div>
+        `;
+        container.appendChild(novoItem);
+    }
+
+    function removeMedicamento(button) {
+        button.closest('.medicamento-item').remove();
+    }
+</script>
