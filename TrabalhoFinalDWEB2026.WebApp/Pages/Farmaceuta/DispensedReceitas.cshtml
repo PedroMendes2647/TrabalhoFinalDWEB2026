@@ -1,0 +1,85 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta.DispensedReceitasModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Receitas Dispensadas";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="bi bi-check2-all"></i> Receitas Dispensadas por Si
+            </h1>
+
+            @if (Model.ReceitasAviadas != null && Model.ReceitasAviadas.Count > 0)
+            {
+                <div class="alert alert-success">
+                    <i class="bi bi-info-circle"></i> 
+                    Dispensou <strong>@Model.ReceitasAviadas.Count</strong> receita(s).
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Receita</th>
+                                <th>Utente</th>
+                                <th>Nº Utente</th>
+                                <th>Doutor</th>
+                                <th>Data Emissão</th>
+                                <th>Data Dispensação</th>
+                                <th>Nº Medicamentos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var receita in Model.ReceitasAviadas)
+                            {
+                                <tr>
+                                    <td><strong>#@receita.Id</strong></td>
+                                    <td>@receita.Utente?.Nome</td>
+                                    <td>@receita.Utente?.NumeroUtente</td>
+                                    <td>@receita.DoutorUtente?.Nome</td>
+                                    <td>@receita.DataEmissao.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (receita.DataDispensacao.HasValue)
+                                        {
+                                            @receita.DataDispensacao.Value.ToString("dd/MM/yyyy HH:mm")
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @(receita.ListaDeMedicamentos?.Count ?? 0) medicamento(s)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-page="ReceitaDetails" asp-route-id="@receita.Id" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info text-center py-5">
+                    <h4><i class="bi bi-inbox"></i> Sem Receitas Dispensadas</h4>
+                    <p>Ainda não dispensou nenhuma receita.</p>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a asp-page="Dashboard" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Painel
+                </a>
+                <a asp-page="Search" class="btn btn-outline-secondary">
+                    <i class="bi bi-search"></i> Pesquisar Receita
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

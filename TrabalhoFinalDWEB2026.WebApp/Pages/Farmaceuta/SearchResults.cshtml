@@ -1,0 +1,102 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta.SearchResultsModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Resultados da Pesquisa";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="bi bi-search"></i> Resultados da Pesquisa
+            </h1>
+
+            @if (Model.Receitas != null && Model.Receitas.Count > 0)
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Encontradas <strong>@Model.Receitas.Count</strong> receita(s).
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Receita</th>
+                                <th>Utente</th>
+                                <th>Nº Utente</th>
+                                <th>Doutor</th>
+                                <th>Data Emissão</th>
+                                <th>Estado</th>
+                                <th>Nº Medicamentos</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var receita in Model.Receitas)
+                            {
+                                <tr>
+                                    <td><strong>#@receita.Id</strong></td>
+                                    <td>@receita.Utente?.Nome</td>
+                                    <td>@receita.Utente?.NumeroUtente</td>
+                                    <td>@receita.DoutorUtente?.Nome</td>
+                                    <td>@receita.DataEmissao.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        @if (receita.Estado == Receita.State.Emitida)
+                                        {
+                                            <span class="badge bg-warning text-dark">Emitida</span>
+                                        }
+                                        else if (receita.Estado == Receita.State.Aviada)
+                                        {
+                                            <span class="badge bg-success">Aviada</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">@receita.Estado</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @(receita.ListaDeMedicamentos?.Count ?? 0) medicamento(s)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a asp-page="ReceitaDetails" asp-route-id="@receita.Id" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                        @if (receita.Estado == Receita.State.Emitida)
+                                        {
+                                            <form method="post" asp-page-handler="dispense" style="display: inline;">
+                                                <input type="hidden" name="id" value="@receita.Id" />
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Tem a certeza que deseja dispensar esta receita?');">
+                                                    <i class="bi bi-check-circle"></i> Dispensar
+                                                </button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center py-5">
+                    <h4><i class="bi bi-search"></i> Nenhuma Receita Encontrada</h4>
+                    <p>Tente fazer uma nova pesquisa com outros critérios.</p>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a asp-page="Search" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Nova Pesquisa
+                </a>
+                <a asp-page="Dashboard" class="btn btn-outline-secondary">
+                    <i class="bi bi-house"></i> Painel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
