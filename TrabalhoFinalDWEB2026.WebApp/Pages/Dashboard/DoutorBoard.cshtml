@@ -20,7 +20,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Pesquisar Utente</h5>
                                     <p class="card-text">Procure um utente para visualizar os seus dados.</p>
-                                    <a href="#" class="btn btn-primary btn-sm">Pesquisar</a>
+                                    <a asp-page="/Doutor/SearchUtente" class="btn btn-primary btn-sm">Pesquisar</a>
                                 </div>
                             </div>
                         </div>
@@ -29,7 +29,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Criar Receita</h5>
                                     <p class="card-text">Crie uma nova receita para um utente.</p>
-                                    <a href="#" class="btn btn-success btn-sm">Criar</a>
+                                    <a asp-page="/Doutor/CreateReceita" class="btn btn-success btn-sm">Criar</a>
                                 </div>
                             </div>
                         </div>
@@ -38,7 +38,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Minhas Receitas</h5>
                                     <p class="card-text">Visualize as receitas que prescreveu.</p>
-                                    <a href="#" class="btn btn-warning btn-sm">Ver</a>
+                                    <a asp-page="/Management/ViewReceitas" class="btn btn-warning btn-sm">Ver</a>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                         </table>
                     </div>
 
-                    <a href="#" class="btn btn-secondary btn-sm">Editar Perfil</a>
+                    <a asp-page="/MyAccount/EditPerfil" class="btn btn-secondary btn-sm">Editar Perfil</a>
                 </div>
             </div>
         </div>
@@ -80,6 +80,12 @@
 
     .border-left-success {
         border-left: 4px solid #28a745 !important;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+      border-left: 4px solid #28a745 !important;
     }
 
     .border-left-warning {

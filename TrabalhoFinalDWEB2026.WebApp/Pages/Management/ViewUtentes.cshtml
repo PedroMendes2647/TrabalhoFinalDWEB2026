@@ -1,0 +1,76 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Management.ViewUtentesModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Utentes";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="bi bi-people"></i> Lista de Utentes
+            </h1>
+
+            @if (Model.Utentes != null && Model.Utentes.Count > 0)
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Existem <strong>@Model.Utentes.Count</strong> utente(s) registado(s) no sistema.
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Número de Utente</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Data de Nascimento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var utente in Model.Utentes)
+                            {
+                                <tr>
+                                    <td><strong>@utente.NumeroUtente</strong></td>
+                                    <td>@utente.Nome</td>
+                                    <td>@utente.Email</td>
+                                    <td>@utente.DataNascimento.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (User.IsInRole("Doutor"))
+                                        {
+                                            <a asp-page="/Doutor/ViewUtenteData" asp-route-utenteId="@utente.Id" class="btn btn-sm btn-primary">
+                                                <i class="bi bi-eye"></i> Ver
+                                            </a>
+                                        }
+                                        else if (User.IsInRole("Farmaceuta"))
+                                        {
+                                            <a href="javascript:void(0);" class="btn btn-sm btn-secondary" title="Acesso de farmacêutico">
+                                                <i class="bi bi-search"></i> Ver Histórico
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning text-center py-5">
+                    <h4><i class="bi bi-inbox"></i> Sem Utentes</h4>
+                    <p>Não há utentes registados no sistema.</p>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a asp-page="/Dashboard/Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar ao Painel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

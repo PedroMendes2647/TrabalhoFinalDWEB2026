@@ -20,16 +20,16 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Ver Receitas</h5>
                                     <p class="card-text">Visualize todas as receitas emitidas.</p>
-                                    <a href="#" class="btn btn-primary btn-sm">Ver</a>
+                                    <a asp-page="/Farmaceuta/Dashboard" class="btn btn-primary btn-sm">Ver</a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="card border-left-success">
                                 <div class="card-body">
-                                    <h5 class="card-title">Dispensar Receita</h5>
-                                    <p class="card-text">Marque uma receita como dispensada.</p>
-                                    <a href="#" class="btn btn-success btn-sm">Dispensar</a>
+                                    <h5 class="card-title">Pesquisar Receita</h5>
+                                    <p class="card-text">Procure uma receita específica.</p>
+                                    <a asp-page="/Farmaceuta/Search" class="btn btn-success btn-sm">Pesquisar</a>
                                 </div>
                             </div>
                         </div>
@@ -37,8 +37,8 @@
                             <div class="card border-left-warning">
                                 <div class="card-body">
                                     <h5 class="card-title">Medicamentos</h5>
-                                    <p class="card-text">Consulte o stock de medicamentos.</p>
-                                    <a href="#" class="btn btn-warning btn-sm">Ver</a>
+                                    <p class="card-text">Consulte os medicamentos disponíveis.</p>
+                                    <a asp-page="/Management/ViewMedicamentos" class="btn btn-warning btn-sm">Ver</a>
                                 </div>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                         </table>
                     </div>
 
-                    <a href="#" class="btn btn-secondary btn-sm">Editar Perfil</a>
+                    <a asp-page="/MyAccount/EditPerfil" class="btn btn-secondary btn-sm">Editar Perfil</a>
                 </div>
             </div>
         </div>
@@ -80,6 +80,13 @@
 
     .border-left-success {
         border-left: 4px solid #28a745 !important;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+      
+border-left: 4px solid #28a745 !important;
     }
 
     .border-left-warning {
