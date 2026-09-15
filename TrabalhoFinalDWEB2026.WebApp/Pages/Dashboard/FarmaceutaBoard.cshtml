@@ -1,0 +1,88 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Dashboard.FarmaceutaBoardModel
+@{
+    ViewData["Title"] = "Painel do Farmacêutico";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Bem-vindo, @Model.User?.Nome</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Painel de Controlo do Farmacêutico</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card border-left-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ver Receitas</h5>
+                                    <p class="card-text">Visualize todas as receitas emitidas.</p>
+                                    <a href="#" class="btn btn-primary btn-sm">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-left-success">
+                                <div class="card-body">
+                                    <h5 class="card-title">Dispensar Receita</h5>
+                                    <p class="card-text">Marque uma receita como dispensada.</p>
+                                    <a href="#" class="btn btn-success btn-sm">Dispensar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-left-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title">Medicamentos</h5>
+                                    <p class="card-text">Consulte o stock de medicamentos.</p>
+                                    <a href="#" class="btn btn-warning btn-sm">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h5>Informações da Conta</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Número de Farmacêutico:</strong></td>
+                                    <td>@Model.User?.NumeroUtente</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nome:</strong></td>
+                                    <td>@Model.User?.Nome</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>E-mail:</strong></td>
+                                    <td>@Model.User?.Email</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <a href="#" class="btn btn-secondary btn-sm">Editar Perfil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 4px solid #007bff !important;
+    }
+
+    .border-left-success {
+        border-left: 4px solid #28a745 !important;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+</style>
