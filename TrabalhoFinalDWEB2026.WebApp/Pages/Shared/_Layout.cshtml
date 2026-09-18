@@ -116,6 +116,20 @@
             setTimeout(() => toastEl.remove(), 7000);
         });
 
+        // Ouvir evento de nova receita adicionada para atualizar tabelas em tempo real
+        window.receitaConnection.on("ReceitaAdicionada", function (data) {
+            if (window.refreshReceitasTable && typeof window.refreshReceitasTable === 'function') {
+                window.refreshReceitasTable();
+            }
+        });
+
+        // Ouvir evento de receita aviada para atualizar tabelas em tempo real
+        window.receitaConnection.on("ReceitaAviada", function (data) {
+            if (window.refreshReceitasTable && typeof window.refreshReceitasTable === 'function') {
+                window.refreshReceitasTable();
+            }
+        });
+
         window.receitaConnection.start().catch(err => console.error("Erro SignalR: ", err));
     </script>
 

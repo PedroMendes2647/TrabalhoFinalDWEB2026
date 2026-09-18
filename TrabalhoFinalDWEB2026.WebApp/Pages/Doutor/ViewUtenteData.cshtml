@@ -36,7 +36,7 @@
 
                 <div class="card shadow-sm">
                     <div class="card-header bg-warning text-dark">
-                        <h4 class="mb-0">Receitas do Utente (@Model.Receitas?.Count ?? 0)</h4>
+                        <h4 class="mb-0">Receitas do Utente (@(Model.Receitas?.Count ?? 0))</h4>
                     </div>
                     <div class="card-body">
                         @if (Model.Receitas != null && Model.Receitas.Count > 0)
@@ -90,51 +90,54 @@
                                                     }
                                                 </td>
                                             </tr>
-
-                                            <!-- Modal para detalhes da receita -->
-                                            <div class="modal fade" id="receitaModal@(receita.Id)" tabindex="-1" aria-labelledby="receitaLabel@(receita.Id)" aria-hidden="true">
-                                                <div class="modal-dialog modal-lg">
-                                                    <div class="modal-content">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="receitaLabel@(receita.Id)">Detalhes da Receita #@receita.Id</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <h6 class="fw-bold">Medicamentos</h6>
-                                                            @if (receita.ListaDeMedicamentos != null && receita.ListaDeMedicamentos.Count > 0)
-                                                            {
-                                                                <table class="table table-sm">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th>Medicamento</th>
-                                                                            <th>Quantidade</th>
-                                                                            <th>Posologia</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        @foreach (var rm in receita.ListaDeMedicamentos)
-                                                                        {
-                                                                            <tr>
-                                                                                <td>@rm.Medicamento?.Nome</td>
-                                                                                <td>@rm.Quantidade</td>
-                                                                                <td>@rm.Posologia</td>
-                                                                            </tr>
-                                                                        }
-                                                                    </tbody>
-                                                                </table>
-                                                            }
-                                                            else
-                                                            {
-                                                                <p class="text-muted">Sem medicamentos associados.</p>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         }
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- Modals para detalhes das receitas (fora da tabela) -->
+                            @foreach (var receita in Model.Receitas)
+                            {
+                                <div class="modal fade" id="receitaModal@(receita.Id)" tabindex="-1" aria-labelledby="receitaLabel@(receita.Id)" aria-hidden="true">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="receitaLabel@(receita.Id)">Detalhes da Receita #@receita.Id</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h6 class="fw-bold">Medicamentos</h6>
+                                                @if (receita.ListaDeMedicamentos != null && receita.ListaDeMedicamentos.Count > 0)
+                                                {
+                                                    <table class="table table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Medicamento</th>
+                                                                <th>Quantidade</th>
+                                                                <th>Posologia</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach (var rm in receita.ListaDeMedicamentos)
+                                                            {
+                                                                <tr>
+                                                                    <td>@rm.Medicamento?.Nome</td>
+                                                                    <td>@rm.Quantidade</td>
+                                                                    <td>@rm.Posologia</td>
+                                                                </tr>
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                }
+                                                else
+                                                {
+                                                    <p class="text-muted">Sem medicamentos associados.</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         }
                         else
                         {

@@ -16,11 +16,11 @@
             {
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i> 
-                    Tem <strong>@Model.Receitas.Count</strong> receita(s) registada(s).
+                    Tem <strong id="receitasCount">@Model.Receitas.Count</strong> receita(s) registada(s).
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-sm">
+                    <table class="table table-hover table-sm" id="receitasTable">
                         <thead class="table-light">
                             <tr>
                                 <th>ID Receita</th>
@@ -31,7 +31,7 @@
                                 <th>Ações</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="receitasTableBody">
                             @foreach (var receita in Model.Receitas)
                             {
                                 <tr>
@@ -74,7 +74,7 @@
             }
             else
             {
-                <div class="alert alert-info text-center py-5">
+                <div class="alert alert-info text-center py-5" id="emptyAlert">
                     <h4><i class="bi bi-inbox"></i> Sem Receitas</h4>
                     <p>Ainda não tem receitas registadas no sistema.</p>
                 </div>
@@ -91,3 +91,59 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Função para atualizar a tabela de receitas em tempo real via SignalR
+        window.refreshReceitasTable = function () {
+            // Fazer um POST invisível para recarregar apenas os dados da tabela
+            fetch(window.location.href, { method: 'GET' })
+                .then(response => response.text())
+                .then(html => {
+                    // Parser para extrair apenas a tabela do HTML retornado
+                    const parser = new DOMParser();
+                    const newDoc = parser.parseFromString(html, 'text/html');
+
+                    // Encontrar nova tabela
+                    const newTable = newDoc.getElementById('receitasTableBody');
+                    const newCount = newDoc.getElementById('receitasCount');
+                    const emptyAlert = newDoc.getElementById('emptyAlert');
+
+                    if (newTable) {
+                        // Atualizar o corpo da tabela
+                        const currentTableBody = document.getElementById('receitasTableBody');
+                        if (currentTableBody) {
+                            currentTableBody.innerHTML = newTable.innerHTML;
+                        }
+
+                        // Esconder alerta vazio se há receitas
+                        const emptyAlertEl = document.getElementById('emptyAlert');
+                        if (emptyAlertEl) {
+                            emptyAlertEl.style.display = 'none';
+                        }
+
+                        // Atualizar contagem
+                        if (newCount) {
+                            const countEl = document.getElementById('receitasCount');
+                            if (countEl) {
+                                countEl.textContent = newCount.textContent;
+                            }
+                        }
+                    } else if (emptyAlert) {
+                        // Se não há tabela no novo HTML, mostrar alerta vazio
+                        const currentTable = document.getElementById('receitasTable');
+                        if (currentTable) {
+                            currentTable.style.display = 'none';
+                        }
+                        const emptyAlertEl = document.getElementById('emptyAlert');
+                        if (emptyAlertEl) {
+                            emptyAlertEl.style.display = 'block';
+                        }
+                    }
+
+                    console.log('Tabela de receitas atualizada em tempo real');
+                })
+                .catch(err => console.error('Erro ao atualizar receitas:', err));
+        };
+    </script>
+}

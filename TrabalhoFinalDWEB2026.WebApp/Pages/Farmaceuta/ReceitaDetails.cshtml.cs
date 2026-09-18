@@ -82,6 +82,9 @@ namespace TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta {
                 "Receita Aviada"
             );
 
+            // Aguardar 2 segundos para permitir que o toast seja exibido antes do redirect
+            await Task.Delay(2000);
+
             return RedirectToPage("Dashboard");
         }
     }

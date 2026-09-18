@@ -16,11 +16,11 @@
             {
                 <div class="alert alert-info">
                     <i class="bi bi-info-circle"></i> 
-                    Tem <strong>@Model.ReceitasEmitidas.Count</strong> receita(s) pendente(s) para dispensar.
+                    Tem <strong id="receitasCount">@Model.ReceitasEmitidas.Count</strong> receita(s) pendente(s) para dispensar.
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-sm">
+                    <table class="table table-hover table-sm" id="receitasTable">
                         <thead class="table-light">
                             <tr>
                                 <th>ID Receita</th>
@@ -33,7 +33,7 @@
                                 <th>Ações</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="receitasTableBody">
                             @foreach (var receita in Model.ReceitasEmitidas)
                             {
                                 <tr>
@@ -69,7 +69,7 @@
             }
             else
             {
-                <div class="alert alert-success text-center py-5">
+                <div class="alert alert-success text-center py-5" id="emptyAlert">
                     <h4><i class="bi bi-check-circle"></i> Sem Receitas Pendentes</h4>
                     <p>Todas as receitas foram dispensadas!</p>
                 </div>
@@ -86,3 +86,41 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Função para atualizar a tabela de receitas em tempo real via SignalR
+        window.refreshReceitasTable = function () {
+            fetch(window.location.href, { method: 'GET' })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const newDoc = parser.parseFromString(html, 'text/html');
+
+                    const newTable = newDoc.getElementById('receitasTableBody');
+                    const newCount = newDoc.getElementById('receitasCount');
+                    const emptyAlert = newDoc.getElementById('emptyAlert');
+
+                    const currentTable = document.getElementById('receitasTableBody');
+                    const currentEmptyAlert = document.getElementById('emptyAlert');
+
+                    if (newTable && currentTable) {
+                        currentTable.innerHTML = newTable.innerHTML;
+                        if (currentEmptyAlert) currentEmptyAlert.style.display = 'none';
+                    } else if (emptyAlert && currentEmptyAlert) {
+                        const tableEl = document.getElementById('receitasTable');
+                        if (tableEl) tableEl.style.display = 'none';
+                        currentEmptyAlert.style.display = 'block';
+                    }
+
+                    if (newCount) {
+                        const countEl = document.getElementById('receitasCount');
+                        if (countEl) countEl.textContent = newCount.textContent;
+                    }
+
+                    console.log('Tabela de receitas atualizada em tempo real');
+                })
+                .catch(err => console.error('Erro ao atualizar receitas:', err));
+        };
+    </script>
+}

@@ -126,6 +126,9 @@ namespace TrabalhoFinalDWEB2026.WebApp.Pages.Doutor {
                     totalMedicamentos = totalMedicamentos
                 });
 
+                // Aguardar 2 segundos para permitir que o toast seja exibido antes do redirect
+                await Task.Delay(2000);
+
                 return RedirectToPage("ViewUtenteData", new { utenteId });
             } catch (Exception ex) {
                 _logger.LogError(ex, "Erro ao criar receita para utente {UtenteId}", utenteId);
