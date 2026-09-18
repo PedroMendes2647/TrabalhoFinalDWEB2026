@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.WebApp.Data;
+using TrabalhoFinalDWEB2026.WebApp.Hubs;
 using TrabalhoFinalDWEB2026.WebApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Adicionar serviços ao contentor.
 builder.Services.AddRazorPages();
+
+// 1. Registar o serviço do SignalR
+builder.Services.AddSignalR();
 
 // Configurar a base de dados
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -28,8 +32,8 @@ builder.Services.AddIdentity<Utente, IdentityRole<string>>(options => {
 
 // Configurar cookies de autenticação
 builder.Services.ConfigureApplicationCookie(options => {
-    options.LoginPath = "/Login";
-    options.AccessDeniedPath = "/AccessDenied";
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromHours(2);
     options.SlidingExpiration = true;
 });
@@ -39,7 +43,6 @@ var app = builder.Build();
 // Configurar o pipeline de requisições HTTP.
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Error");
-    // O valor padrão HSTS é 30 dias. Pode querer alterar isto para cenários de produção, veja https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -51,6 +54,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// 2. Mapear o endpoint do Hub do SignalR para comunicação em tempo real
+app.MapHub<ReceitaHub>("/receitaHub");
+
 app.MapRazorPages()
    .WithStaticAssets();
 

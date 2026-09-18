@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.WebApp.Data;
+using TrabalhoFinalDWEB2026.WebApp.Hubs;
 using TrabalhoFinalDWEB2026.WebApp.Models;
 
 namespace TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta {
@@ -12,16 +14,19 @@ namespace TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Utente> _userManager;
         private readonly ILogger<ReceitaDetailsModel> _logger;
+        private readonly IHubContext<ReceitaHub> _hubContext;
 
         public Receita? Receita { get; set; }
 
         public ReceitaDetailsModel(
             ApplicationDbContext context,
             UserManager<Utente> userManager,
-            ILogger<ReceitaDetailsModel> logger) {
+            ILogger<ReceitaDetailsModel> logger,
+            IHubContext<ReceitaHub> hubContext) {
             _context = context;
             _userManager = userManager;
             _logger = logger;
+            _hubContext = hubContext;
         }
 
         public async Task<IActionResult> OnGetAsync(int id) {
@@ -41,7 +46,9 @@ namespace TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta {
         }
 
         public async Task<IActionResult> OnPostAsync(int id) {
-            var receita = await _context.Receitas.FindAsync(id);
+            var receita = await _context.Receitas
+                .Include(r => r.Utente)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (receita == null) {
                 return NotFound("Receita não encontrada.");
@@ -67,6 +74,13 @@ namespace TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta {
 
             _logger.LogInformation("Farmacêutico {FarmaceutaId} dispensou a receita {ReceitaId}",
                 currentUser.Id, id);
+
+            // Disparar notificação via SignalR em tempo real
+            await _hubContext.Clients.All.SendAsync(
+                "NotificacaoReceita",
+                $"A receita #{receita.Id} de {receita.Utente?.Nome} foi dispensada com sucesso.",
+                "Receita Aviada"
+            );
 
             return RedirectToPage("Dashboard");
         }

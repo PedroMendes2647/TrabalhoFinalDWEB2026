@@ -88,32 +88,37 @@
     let medicamentoCount = 1;
 
     function adicionarMedicamento() {
-        const container = document.getElementById('medicamentosContainer');
-        const medicamentos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Medicamentos.Select(m => new { m.Id, m.Nome, m.Dosagem })));
+    const container = document.getElementById('medicamentosContainer');
+    const medicamentos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Medicamentos.Select(m => new { m.Id, m.Nome, m.Dosagem })));
 
-        const novoItem = document.createElement('div');
-        novoItem.className = 'medicamento-item mb-3 p-3 border rounded';
-        novoItem.innerHTML = `
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Medicamento</label>
-                    <select class="form-select" name="MedicamentoIds" required>
-                        <option value="">-- Selecione um medicamento --</option>
-                        ${medicamentos.map(m => `<option value="${m.id}">${m.nome} (${m.dosagem})</option>`).join('')}
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Quantidade</label>
-                    <input type="number" class="form-control" name="Quantidades" value="1" min="1" max="100" required />
-                </div>
-                <div class="col-md-2">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="button" class="btn btn-danger w-100" onclick="removeMedicamento(this)">Remover</button>
-                </div>
+    const novoItem = document.createElement('div');
+    novoItem.className = 'medicamento-item mb-3 p-3 border rounded';
+    novoItem.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label">Medicamento</label>
+                <select class="form-select" name="MedicamentoIds" required>
+                    <option value="">-- Selecione um medicamento --</option>
+                    ${medicamentos.map(m => {
+                        const id = m.Id ?? m.id;
+                        const nome = m.Nome ?? m.nome;
+                        const dosagem = m.Dosagem ?? m.dosagem;
+                        return `<option value="${id}">${nome} (${dosagem})</option>`;
+                    }).join('')}
+                </select>
             </div>
-        `;
-        container.appendChild(novoItem);
-    }
+            <div class="col-md-4">
+                <label class="form-label">Quantidade</label>
+                <input type="number" class="form-control" name="Quantidades" value="1" min="1" max="100" required />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button type="button" class="btn btn-danger w-100" onclick="removeMedicamento(this)">Remover</button>
+            </div>
+        </div>
+    `;
+    container.appendChild(novoItem);
+}
 
     function removeMedicamento(button) {
         button.closest('.medicamento-item').remove();
