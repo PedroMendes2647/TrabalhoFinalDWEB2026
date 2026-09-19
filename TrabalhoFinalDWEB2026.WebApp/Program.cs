@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using TrabalhoFinalDWEB2026.WebApp.Data;
 using TrabalhoFinalDWEB2026.WebApp.Hubs;
 using TrabalhoFinalDWEB2026.WebApp.Models;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,10 +14,20 @@ builder.Services.AddRazorPages();
 // 1. Registar o serviço do SignalR
 builder.Services.AddSignalR();
 
-// Configurar a base de dados
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? "Server=(localdb)\\mssqllocaldb;Database=TrabalhoFinalDWEB2026;Trusted_Connection=True;MultipleActiveResultSets=true"));
+// Configurar a base de dados com Azure Identity (Managed Identity em Azure)
+builder.Services.AddDbContext<ApplicationDbContext>(options => {
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+    if (string.IsNullOrEmpty(connectionString) && !builder.Environment.IsDevelopment()) {
+        throw new InvalidOperationException("Connection string 'DefaultConnection' not found in configuration.");
+    }
+
+    options.UseSqlServer(connectionString 
+        ?? "Server=(localdb)\\mssqllocaldb;Database=TrabalhoFinalDWEB2026;Trusted_Connection=True;MultipleActiveResultSets=true",
+        sqlOptions => {
+            sqlOptions.EnableRetryOnFailure(maxRetryCount: 3);
+        });
+});
 
 // Configurar identidade
 builder.Services.AddIdentity<Utente, IdentityRole<string>>(options => {
@@ -40,6 +52,32 @@ builder.Services.ConfigureApplicationCookie(options => {
 
 var app = builder.Build();
 
+// Aplicar migrations da base de dados (Azure/Production)
+if (!app.Environment.IsDevelopment()) {
+    try {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("Iniciando aplicação de migrations da base de dados...");
+
+        using (var scope = app.Services.CreateScope()) {
+            var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            logger.LogInformation("Verificando conexão com base de dados...");
+            db.Database.OpenConnection();
+            db.Database.CloseConnection();
+            logger.LogInformation("Conexão com base de dados OK");
+
+            logger.LogInformation("Aplicando migrations...");
+            db.Database.Migrate();
+            logger.LogInformation("Migrations aplicadas com sucesso");
+        }
+    }
+    catch (Exception ex) {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Erro crítico ao aplicar migrations da base de dados. Aplicação iniciará sem migrations.");
+        // Não lançar exceção - permitir que a app inicie para debug
+    }
+}
+
 // Configurar o pipeline de requisições HTTP.
 if (!app.Environment.IsDevelopment()) {
     app.UseExceptionHandler("/Error");
@@ -55,7 +93,7 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
-// 2. Mapear o endpoint do Hub do SignalR para comunicação em tempo real
+// Mapear o endpoint do Hub do SignalR para comunicação em tempo real
 app.MapHub<ReceitaHub>("/receitaHub");
 
 app.MapRazorPages()
