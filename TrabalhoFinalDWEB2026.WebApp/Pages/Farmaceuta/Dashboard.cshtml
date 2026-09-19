@@ -1,0 +1,126 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Farmaceuta.DashboardModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Painel do Farmacêutico";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                <i class="bi bi-capsule"></i> Receitas para Dispensar
+            </h1>
+
+            @if (Model.ReceitasEmitidas != null && Model.ReceitasEmitidas.Count > 0)
+            {
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    Tem <strong id="receitasCount">@Model.ReceitasEmitidas.Count</strong> receita(s) pendente(s) para dispensar.
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm" id="receitasTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID Receita</th>
+                                <th>Utente</th>
+                                <th>Nº Utente</th>
+                                <th>Doutor</th>
+                                <th>Data Emissão</th>
+                                <th>Nº Medicamentos</th>
+                                <th>Estado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="receitasTableBody">
+                            @foreach (var receita in Model.ReceitasEmitidas)
+                            {
+                                <tr>
+                                    <td><strong>#@receita.Id</strong></td>
+                                    <td>@receita.Utente?.Nome</td>
+                                    <td>@receita.Utente?.NumeroUtente</td>
+                                    <td>@receita.DoutorUtente?.Nome</td>
+                                    <td>@receita.DataEmissao.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @(receita.ListaDeMedicamentos?.Count ?? 0) medicamento(s)
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark">@receita.Estado</span>
+                                    </td>
+                                    <td>
+                                        <a asp-page="ReceitaDetails" asp-route-id="@receita.Id" class="btn btn-sm btn-info">
+                                            <i class="bi bi-eye"></i> Ver
+                                        </a>
+                                        <form method="post" asp-page-handler="dispense" style="display: inline;">
+                                            <input type="hidden" name="id" value="@receita.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Tem a certeza que deseja dispensar esta receita?');">
+                                                <i class="bi bi-check-circle"></i> Dispensar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success text-center py-5" id="emptyAlert">
+                    <h4><i class="bi bi-check-circle"></i> Sem Receitas Pendentes</h4>
+                    <p>Todas as receitas foram dispensadas!</p>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a asp-page="DispensedReceitas" class="btn btn-outline-primary">
+                    <i class="bi bi-check2-all"></i> Ver Receitas Dispensadas
+                </a>
+                <a asp-page="Search" class="btn btn-outline-secondary">
+                    <i class="bi bi-search"></i> Pesquisar Receita
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Função para atualizar a tabela de receitas em tempo real via SignalR
+        window.refreshReceitasTable = function () {
+            fetch(window.location.href, { method: 'GET' })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const newDoc = parser.parseFromString(html, 'text/html');
+
+                    const newTable = newDoc.getElementById('receitasTableBody');
+                    const newCount = newDoc.getElementById('receitasCount');
+                    const emptyAlert = newDoc.getElementById('emptyAlert');
+
+                    const currentTable = document.getElementById('receitasTableBody');
+                    const currentEmptyAlert = document.getElementById('emptyAlert');
+
+                    if (newTable && currentTable) {
+                        currentTable.innerHTML = newTable.innerHTML;
+                        if (currentEmptyAlert) currentEmptyAlert.style.display = 'none';
+                    } else if (emptyAlert && currentEmptyAlert) {
+                        const tableEl = document.getElementById('receitasTable');
+                        if (tableEl) tableEl.style.display = 'none';
+                        currentEmptyAlert.style.display = 'block';
+                    }
+
+                    if (newCount) {
+                        const countEl = document.getElementById('receitasCount');
+                        if (countEl) countEl.textContent = newCount.textContent;
+                    }
+
+                    console.log('Tabela de receitas atualizada em tempo real');
+                })
+                .catch(err => console.error('Erro ao atualizar receitas:', err));
+        };
+    </script>
+}

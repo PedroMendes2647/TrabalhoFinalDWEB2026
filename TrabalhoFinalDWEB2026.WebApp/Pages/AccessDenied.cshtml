@@ -1,0 +1,43 @@
+@page
+@model AccessDeniedModel
+@{
+    ViewData["Title"] = "Acesso Negado";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Acesso Negado</h3>
+                </div>
+                <div class="card-body text-center py-5">
+                    <p class="lead mb-4">
+                        Desculpe, não tem permissão para aceder a este recurso.
+                    </p>
+                    <p class="text-muted mb-4">
+                        Se acredita que isto é um erro, contacte o administrador do sistema.
+                    </p>
+
+                    <div class="d-flex gap-2 justify-content-center">
+                        <a asp-page="/Index" class="btn btn-primary">
+                            <i class="bi bi-house-fill"></i> Página Inicial
+                        </a>
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <a asp-page="/Dashboard/Index" class="btn btn-outline-primary">
+                                <i class="bi bi-speedometer2"></i> Dashboard
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-page="/Account/Login" class="btn btn-outline-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sessão
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

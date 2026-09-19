@@ -1,0 +1,94 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Dashboard.DoutorBoardModel
+@{
+    ViewData["Title"] = "Painel do Doutor";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Bem-vindo, Dr./Dra. @Model.User?.Nome</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Painel de Controlo do Doutor</p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card border-left-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pesquisar Utente</h5>
+                                    <p class="card-text">Procure um utente para visualizar os seus dados.</p>
+                                    <a asp-page="/Doutor/SearchUtente" class="btn btn-primary btn-sm">Pesquisar</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                             <div class="card border-left-success">
+                                 <div class="card-body">
+                                    <h5 class="card-title">Criar Receita</h5>
+                                     <p class="card-text">Crie uma nova receita para um utente.</p>
+                                     <a asp-page="/Doutor/SearchUtente" class="btn btn-success btn-sm">Criar</a>
+                                 </div>
+                             </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-left-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title">Minhas Receitas</h5>
+                                    <p class="card-text">Visualize as receitas que prescreveu.</p>
+                                    <a asp-page="/Management/ViewReceitas" class="btn btn-warning btn-sm">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h5>Informações da Conta</h5>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Número de Doutor:</strong></td>
+                                    <td>@Model.User?.NumeroUtente</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nome:</strong></td>
+                                    <td>@Model.User?.Nome</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>E-mail:</strong></td>
+                                    <td>@Model.User?.Email</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <a asp-page="/MyAccount/EditPerfil" class="btn btn-secondary btn-sm">Editar Perfil</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 4px solid #007bff !important;
+    }
+
+    .border-left-success {
+        border-left: 4px solid #28a745 !important;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+      border-left: 4px solid #28a745 !important;
+    }
+
+    .border-left-warning {
+        border-left: 4px solid #ffc107 !important;
+    }
+</style>

@@ -1,0 +1,70 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.MyAccount.MyDataModel
+@{
+    ViewData["Title"] = "Meus Dados";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-circle"></i> Meus Dados Pessoais
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.CurrentUser != null)
+                    {
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-muted">Número de Utente</h6>
+                                <p class="fs-5">@Model.CurrentUser.NumeroUtente</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-muted">Nome</h6>
+                                <p class="fs-5">@Model.CurrentUser.Nome</p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-muted">Data de Nascimento</h6>
+                                <p class="fs-5">@Model.CurrentUser.DataNascimento.ToString("dd/MM/yyyy")</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-muted">E-mail</h6>
+                                <p class="fs-5">@Model.CurrentUser.Email</p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> 
+                            <strong>Nota:</strong> Para editar os seus dados, utilize a página de Editar Perfil.
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a asp-page="EditPerfil" class="btn btn-primary">
+                                <i class="bi bi-pencil"></i> Editar Perfil
+                            </a>
+                            <a asp-page="MyReceitas" class="btn btn-outline-secondary">
+                                <i class="bi bi-file-earmark-text"></i> Minhas Receitas
+                            </a>
+                            <a asp-page="/Dashboard/Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-house"></i> Painel
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger">
+                            <p>Não foi possível carregar os seus dados. Por favor, tente novamente mais tarde.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

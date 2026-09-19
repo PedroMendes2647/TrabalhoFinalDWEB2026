@@ -1,0 +1,93 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Management.ViewUtenteProfileModel
+@using TrabalhoFinalDWEB2026.WebApp.Models
+@{
+    ViewData["Title"] = "Perfil do Utente";
+}
+
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            @if (Model.Utente != null)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="bi bi-person-circle"></i> Perfil do Utente
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Nome Completo:</strong><br />
+                                    @Model.Utente.Nome
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Número de Utente:</strong><br />
+                                    @Model.Utente.NumeroUtente
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>E-mail:</strong><br />
+                                    @Model.Utente.Email
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Data de Nascimento:</strong><br />
+                                    @Model.Utente.DataNascimento.ToString("dd/MM/yyyy")
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Nome de Utilizador:</strong><br />
+                                    @Model.Utente.UserName
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>
+                                    <strong>Número de Telefone:</strong><br />
+                                    @(string.IsNullOrEmpty(Model.Utente.PhoneNumber) ? "Não fornecido" : Model.Utente.PhoneNumber)
+                                </p>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div>
+                            <p>
+                                <strong>Receitas Associadas:</strong><br />
+                                <span class="badge bg-info">@Model.ReceitasCount</span>
+                            </p>
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex gap-2">
+                            <a asp-page="/Index" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <p>Utente não encontrado.</p>
+                    <a asp-page="/Index" class="btn btn-secondary">Voltar</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

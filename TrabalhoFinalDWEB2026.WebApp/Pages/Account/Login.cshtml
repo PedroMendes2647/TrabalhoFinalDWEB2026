@@ -1,0 +1,101 @@
+@page
+@model TrabalhoFinalDWEB2026.WebApp.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Iniciar Sessão";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Iniciar Sessão</h2>
+
+                    @if (Model.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @Model.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                        </div>
+                    }
+
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="NumeroUtente" class="form-label">Número de Utente</label>
+                            <input class="form-control @(ModelState.IsValid ? "" : "is-invalid")" type="text" asp-for="Input.NumeroUtente" autocomplete="username" placeholder="Insira o seu número de utente" />
+                            <span asp-validation-for="Input.NumeroUtente" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Password" class="form-label">Palavra-passe</label>
+                            <input class="form-control @(ModelState.IsValid ? "" : "is-invalid")" type="password" asp-for="Input.Password" autocomplete="current-password" placeholder="Insira a sua palavra-passe" />
+                            <span asp-validation-for="Input.Password" class="invalid-feedback"></span>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="Input.RememberMe" />
+                            <label class="form-check-label" asp-for="Input.RememberMe">
+                                Lembrar-me
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Iniciar Sessão</button>
+                    </form>
+
+                    <hr class="my-4" />
+
+                    <p class="text-center">
+                        Não tem conta? <a asp-page="./Register">Registar-se aqui</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Ajuda / Credenciais de Teste Rápidas -->
+            <section class="mt-5">
+                <div class="card border-warning">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-question-circle"></i> Credenciais de Acesso Iniciais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Paciente / Utente -->
+                            <div class="col-md-4 mb-2">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2"><small class="fw-bold"> Utente / Paciente</small></div>
+                                    <div class="card-body py-2">
+                                        <small><strong>Nº:</strong> <code>000000001</code></small><br>
+                                        <small><strong>Pass:</strong> <code>Senha@123</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Médico / Doutor -->
+                            <div class="col-md-4 mb-2">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2"><small class="fw-bold"> Médico / Doutor</small></div>
+                                    <div class="card-body py-2">
+                                        <small><strong>Nº:</strong> <code>000000002</code></small><br>
+                                        <small><strong>Pass:</strong> <code>Senha@123</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Farmacêutico -->
+                            <div class="col-md-4 mb-2">
+                                <div class="card bg-light">
+                                    <div class="card-header py-2"><small class="fw-bold"> Farmacêutico</small></div>
+                                    <div class="card-body py-2">
+                                        <small><strong>Nº:</strong> <code>000000003</code></small><br>
+                                        <small><strong>Pass:</strong> <code>Senha@123</code></small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
